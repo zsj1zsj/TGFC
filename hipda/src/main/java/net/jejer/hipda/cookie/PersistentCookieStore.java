@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PersistentCookieStore implements CookieStore {
     private static final String COOKIE_PREFS = "CookiePrefsFile";
     private static final String COOKIE_NAME_PREFIX = "cookie_";
-    private static final String COOKIE_DOMAIN = ".hi-pda.com";
+    private static final String COOKIE_DOMAIN = ".tgfcer.com";
 
     private final HashMap<String, ConcurrentHashMap<String, HttpCookie>> cookies;
     private final SharedPreferences cookiePrefs;

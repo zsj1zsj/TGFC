@@ -3,6 +3,7 @@ package net.jejer.hipda.okhttp;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -20,6 +21,7 @@ import net.jejer.hipda.utils.HiUtils;
 import net.jejer.hipda.utils.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -93,6 +95,7 @@ public class OkHttpHelper {
         Request.Builder reqBuilder = new Request.Builder();
         reqBuilder.url(url)
                 .header("User-Agent", HiUtils.getUserAgent())
+                .addHeader("Cookie",cookieStore.getCookies().toString())
                 .post(requestBody);
 
         if (tag != null)
@@ -108,6 +111,23 @@ public class OkHttpHelper {
         Response response = call.execute();
 
         return getResponseBody(response);
+    }
+
+    public InputStream getBitbmp(String url) throws  IOException {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .header("User-Agent", HiUtils.getUserAgent());
+        builder.addHeader("Referer",HiUtils.LoginSubmit);
+        cookieStore.removeAll();
+        Request request = builder.build();
+
+        Response response = client.newCall(request).execute();
+
+        InputStream is = response.body().byteStream();
+
+        Log.d("cookieOk", "getBitbmp: "+cookieStore.getCookies());
+
+        return is;
     }
 
     public void asyncGet(String url, ResultCallback callback) {
@@ -139,10 +159,19 @@ public class OkHttpHelper {
 
     public String post(String url, Map<String, String> params) throws IOException {
         Request request = buildPostFormRequest(url, params, null);
+        Log.d("cookieOT", "post: "+request.headers().get("Cookie"));
         Response response = client.newCall(request).execute();
         return getResponseBody(response);
     }
 
+
+    public String postWithCookie(String url, Map<String, String> params) throws IOException {
+        Request request = buildPostFormRequest(url, params, null);
+        Log.d("cookieOT", "post: "+request.headers().toString());
+        Log.d("cookieOT", "post: "+request.body());
+        Response response = client.newCall(request).execute();
+        return getResponseBody(response);
+    }
 
     private String getResponseBody(Response response) throws IOException {
         if (!response.isSuccessful()) {

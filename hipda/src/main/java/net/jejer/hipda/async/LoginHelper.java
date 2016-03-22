@@ -103,18 +103,21 @@ public class LoginHelper {
 
     private int doLogin(String formhash) {
         Map<String, String> post_param = new HashMap<>();
-        post_param.put("m_formhash", formhash);
+        post_param.put("formhash", formhash);
         post_param.put("referer", HiUtils.BaseUrl + "index.php");
         post_param.put("loginfield", "username");
         post_param.put("username", HiSettingsHelper.getInstance().getUsername());
         post_param.put("password", HiSettingsHelper.getInstance().getPassword());
+        post_param.put("seccodeverify",HiSettingsHelper.getInstance().getSecCodeVerify());
         post_param.put("questionid", HiSettingsHelper.getInstance().getSecQuestion());
         post_param.put("answer", HiSettingsHelper.getInstance().getSecAnswer());
         post_param.put("cookietime", "2592000");
 
+        Logger.v(post_param.toString());
+
         String rspStr;
         try {
-            rspStr = OkHttpHelper.getInstance().post(HiUtils.LoginSubmit, post_param);
+            rspStr = OkHttpHelper.getInstance().postWithCookie(HiUtils.LoginSubmit, post_param);
             Logger.v(rspStr);
 
             // response is in XML format
@@ -130,6 +133,10 @@ public class LoginHelper {
                 } else {
                     mErrorMsg = "登录失败,请检查账户信息";
                 }
+                return Constants.STATUS_FAIL_ABORT;
+            } else if (rspStr.contains(mCtx.getString(R.string.login_seccode_fail))) {
+                Logger.e("Login FAIL");
+                mErrorMsg = "您输入的验证码不正确，请返回修改。";
                 return Constants.STATUS_FAIL_ABORT;
             } else {
                 mErrorMsg = "登录失败,未知错误";

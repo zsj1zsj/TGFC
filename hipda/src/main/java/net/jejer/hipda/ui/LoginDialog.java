@@ -2,16 +2,21 @@ package net.jejer.hipda.ui;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,7 +24,15 @@ import net.jejer.hipda.R;
 import net.jejer.hipda.async.FavoriteHelper;
 import net.jejer.hipda.async.LoginHelper;
 import net.jejer.hipda.bean.HiSettingsHelper;
+import net.jejer.hipda.okhttp.OkHttpHelper;
 import net.jejer.hipda.utils.Constants;
+import net.jejer.hipda.utils.HiUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * dialog for login
@@ -32,6 +45,7 @@ public class LoginDialog extends Dialog {
     private Context mCtx;
     private HiProgressDialog progressDialog;
     private Handler mHandler;
+    ImageView ivSecCodeVerify;
 
     private LoginDialog(Context context) {
         super(context);
@@ -54,6 +68,8 @@ public class LoginDialog extends Dialog {
 
         final EditText etUsername = (EditText) view.findViewById(R.id.login_username);
         final EditText etPassword = (EditText) view.findViewById(R.id.login_password);
+        final EditText etSecCodeVerify = (EditText) view.findViewById(R.id.login_seccodeverify);
+        ivSecCodeVerify = (ImageView) view.findViewById(R.id.seccode_image);
         final Spinner spSecQuestion = (Spinner) view.findViewById(R.id.login_question);
         final EditText etSecAnswer = (EditText) view.findViewById(R.id.login_answer);
 
@@ -64,6 +80,16 @@ public class LoginDialog extends Dialog {
 
         etUsername.setText(HiSettingsHelper.getInstance().getUsername());
         etPassword.setText(HiSettingsHelper.getInstance().getPassword());
+
+        final String SecCodeURL = HiUtils.SecCodeVerifyUrl + Math.random();
+        new DownImgAsyncTask().execute(SecCodeURL);
+        ivSecCodeVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DownImgAsyncTask().execute(SecCodeURL);
+            }
+        });
+
         if (!TextUtils.isEmpty(HiSettingsHelper.getInstance().getSecQuestion())
                 && TextUtils.isDigitsOnly(HiSettingsHelper.getInstance().getSecQuestion())) {
             int idx = Integer.parseInt(HiSettingsHelper.getInstance().getSecQuestion());
@@ -71,6 +97,7 @@ public class LoginDialog extends Dialog {
                 spSecQuestion.setSelection(idx);
         }
         etSecAnswer.setText(HiSettingsHelper.getInstance().getSecAnswer());
+
 
         Button btnLogin = (Button) view.findViewById(R.id.login_btn);
         btnLogin.setOnClickListener(new OnSingleClickListener() {
@@ -83,6 +110,7 @@ public class LoginDialog extends Dialog {
 
                 HiSettingsHelper.getInstance().setUsername(etUsername.getText().toString());
                 HiSettingsHelper.getInstance().setPassword(etPassword.getText().toString());
+                HiSettingsHelper.getInstance().setSecCodeVerity(etSecCodeVerify.getText().toString());
                 HiSettingsHelper.getInstance().setSecQuestion(adapter.getEntryValue(spSecQuestion.getSelectedItemPosition()));
                 HiSettingsHelper.getInstance().setSecAnswer(etSecAnswer.getText().toString());
                 HiSettingsHelper.getInstance().setUid("");
@@ -148,4 +176,61 @@ public class LoginDialog extends Dialog {
     public void setHandler(Handler handler) {
         mHandler = handler;
     }
+
+
+    private Bitmap getImageBitmap(String url) {
+//        URL imgUrl;
+        Bitmap bitmap = null;
+        try {
+//            imgUrl = new URL(url);
+//            HttpURLConnection conn = (HttpURLConnection) imgUrl.openConnection();
+//            conn.setRequestProperty("Referer", HiUtils.LoginSubmit);
+//            conn.setDoInput(true);
+//            conn.connect();
+//            InputStream is = conn.getInputStream();
+            OkHttpHelper httpClient = OkHttpHelper.getInstance();
+            httpClient.get(HiUtils.LoginGetFormHash);
+            //To Do
+            InputStream is = httpClient.getBitbmp(url);
+            bitmap = BitmapFactory.decodeStream(is);
+            is.close();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            Log.d("SecCode", "getImageBitmap: "+e);
+        }
+        return bitmap;
+    }
+
+    class DownImgAsyncTask extends AsyncTask<String, Void, Bitmap> {
+
+
+        @Override
+        protected void onPreExecute() {
+            // TODO Auto-generated method stub
+            super.onPreExecute();
+            ivSecCodeVerify.setImageBitmap(null);
+
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            // TODO Auto-generated method stub
+            Bitmap b = getImageBitmap(params[0]);
+            return b;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            // TODO Auto-generated method stub
+            super.onPostExecute(result);
+            if (result != null) {
+                ivSecCodeVerify.setImageBitmap(result);
+            }
+        }
+
+
+    }
 }
+

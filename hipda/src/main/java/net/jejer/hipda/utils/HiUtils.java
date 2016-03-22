@@ -11,7 +11,8 @@ import net.jejer.hipda.ui.HiApplication;
 
 public class HiUtils {
     public static final String UserAgentPrefix = "net.jejer.hipda ";
-    public static final String BaseUrl = "http://www.hi-pda.com/forum/";
+    public static final String BaseUrl = "http://club.tgfcer.com/";
+    public static final String SecCodeVerifyUrl = BaseUrl + "seccode.php?update=";
     public static final String ThreadListUrl = BaseUrl + "forumdisplay.php?fid=";
     public static final String DetailListUrl = BaseUrl + "viewthread.php?tid=";
     public static final String ReplyUrl = BaseUrl + "post.php?action=reply&tid=";
@@ -42,7 +43,7 @@ public class HiUtils {
     public static final String AvatarBaseUrl = BaseUrl + "uc_server/data/avatar/";
 
     public static final String LoginSubmit = BaseUrl + "logging.php?action=login&loginsubmit=yes&inajax=1";
-    public static final String LoginGetFormHash = BaseUrl + "logging.php?action=login&referer=http%3A//www.hi-pda.com/forum/logging.php";
+    public static final String LoginGetFormHash = BaseUrl + "logging.php?action=login&referer=http%3A//club.tgfcer.com/index.php";
 
     private static String userAgent;
 
@@ -51,11 +52,11 @@ public class HiUtils {
     private final static String AVATAR_BASE = "000000000";
     public static int MAX_THREADS_IN_PAGE = 50;
 
-    public final static int FID_BS = 6;
-    public final static int FID_DISCOVERY = 2;
+    public final static int FID_BS = 90;
+    public final static int FID_DISCOVERY = 25;
 
     public final static String[] FORUMS = {"Discovery", "Buy & Sell", "Geek Talks", "E-INK", "PalmOS", "疑似机器人"};
-    public final static int[] FORUM_IDS = {FID_DISCOVERY, FID_BS, 7, 59, 12, 57};
+    public final static int[] FORUM_IDS = {FID_DISCOVERY, FID_BS, 33, 41, 85, 59};
     public final static IIcon[] FORUM_ICONS = {
             FontAwesome.Icon.faw_cc_discover,
             FontAwesome.Icon.faw_shopping_cart,

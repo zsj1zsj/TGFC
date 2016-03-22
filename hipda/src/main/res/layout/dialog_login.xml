@@ -27,6 +27,21 @@
             android:inputType="textPassword"
             android:textSize="18sp" />
 
+        <EditText
+            android:id="@+id/login_seccodeverify"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/pref_title_seccodeverify"
+            android:ems="4"
+            android:layout_margin="8dp" />
+
+        <ImageView
+            android:layout_width="325dp"
+            android:layout_height="100dp"
+            android:id="@+id/seccode_image"
+            android:layout_gravity="bottom"
+            android:layout_margin="8dp" />
+
         <Spinner
             android:id="@+id/login_question"
             android:layout_width="match_parent"
