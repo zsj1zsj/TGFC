@@ -1,5 +1,7 @@
 package net.jejer.hipda.okhttp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -95,7 +97,6 @@ public class OkHttpHelper {
         Request.Builder reqBuilder = new Request.Builder();
         reqBuilder.url(url)
                 .header("User-Agent", HiUtils.getUserAgent())
-                .addHeader("Cookie",cookieStore.getCookies().toString())
                 .post(requestBody);
 
         if (tag != null)
@@ -113,21 +114,19 @@ public class OkHttpHelper {
         return getResponseBody(response);
     }
 
-    public InputStream getBitbmp(String url) throws  IOException {
+    public Bitmap getSecCode(String url) throws  IOException {
         Request.Builder builder = new Request.Builder()
                 .url(url)
                 .header("User-Agent", HiUtils.getUserAgent());
         builder.addHeader("Referer",HiUtils.LoginSubmit);
-        cookieStore.removeAll();
-        Request request = builder.build();
 
+        Request request = builder.build();
         Response response = client.newCall(request).execute();
 
         InputStream is = response.body().byteStream();
+        Bitmap bm = BitmapFactory.decodeStream(is);
 
-        Log.d("cookieOk", "getBitbmp: "+cookieStore.getCookies());
-
-        return is;
+        return bm;
     }
 
     public void asyncGet(String url, ResultCallback callback) {
@@ -160,15 +159,6 @@ public class OkHttpHelper {
     public String post(String url, Map<String, String> params) throws IOException {
         Request request = buildPostFormRequest(url, params, null);
         Log.d("cookieOT", "post: "+request.headers().get("Cookie"));
-        Response response = client.newCall(request).execute();
-        return getResponseBody(response);
-    }
-
-
-    public String postWithCookie(String url, Map<String, String> params) throws IOException {
-        Request request = buildPostFormRequest(url, params, null);
-        Log.d("cookieOT", "post: "+request.headers().toString());
-        Log.d("cookieOT", "post: "+request.body());
         Response response = client.newCall(request).execute();
         return getResponseBody(response);
     }
@@ -253,7 +243,7 @@ public class OkHttpHelper {
     public boolean isLoggedIn() {
         List<HttpCookie> cookies = cookieStore.getCookies();
         for (HttpCookie cookie : cookies) {
-            if ("cdb_auth".equals(cookie.getName())) {
+            if ("tgc_auth".equals(cookie.getName())) {
                 return true;
             }
         }
@@ -263,7 +253,7 @@ public class OkHttpHelper {
     public String getAuthCookie() {
         List<HttpCookie> cookies = cookieStore.getCookies();
         for (HttpCookie cookie : cookies) {
-            if ("cdb_auth".equals(cookie.getName())) {
+            if ("tgc_auth".equals(cookie.getName())) {
                 return cookie.getValue();
             }
         }

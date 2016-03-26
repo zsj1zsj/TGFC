@@ -2,15 +2,12 @@ package net.jejer.hipda.ui;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,10 +26,6 @@ import net.jejer.hipda.utils.Constants;
 import net.jejer.hipda.utils.HiUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * dialog for login
@@ -178,31 +171,6 @@ public class LoginDialog extends Dialog {
     }
 
 
-    private Bitmap getImageBitmap(String url) {
-//        URL imgUrl;
-        Bitmap bitmap = null;
-        try {
-//            imgUrl = new URL(url);
-//            HttpURLConnection conn = (HttpURLConnection) imgUrl.openConnection();
-//            conn.setRequestProperty("Referer", HiUtils.LoginSubmit);
-//            conn.setDoInput(true);
-//            conn.connect();
-//            InputStream is = conn.getInputStream();
-            OkHttpHelper httpClient = OkHttpHelper.getInstance();
-            httpClient.get(HiUtils.LoginGetFormHash);
-            //To Do
-            InputStream is = httpClient.getBitbmp(url);
-            bitmap = BitmapFactory.decodeStream(is);
-            is.close();
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            Log.d("SecCode", "getImageBitmap: "+e);
-        }
-        return bitmap;
-    }
-
     class DownImgAsyncTask extends AsyncTask<String, Void, Bitmap> {
 
 
@@ -217,7 +185,12 @@ public class LoginDialog extends Dialog {
         @Override
         protected Bitmap doInBackground(String... params) {
             // TODO Auto-generated method stub
-            Bitmap b = getImageBitmap(params[0]);
+            Bitmap b = null;
+            try {
+                b = OkHttpHelper.getInstance().getSecCode(params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return b;
         }
 

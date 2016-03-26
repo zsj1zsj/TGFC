@@ -46,10 +46,12 @@ public class LoginHelper {
         int status = Constants.STATUS_FAIL_ABORT;
 
         if (HiSettingsHelper.getInstance().isLoginInfoValid()) {
-            String formhash = getFormhash();
-            if (!TextUtils.isEmpty(formhash)) {
-                status = doLogin(formhash);
-            }
+//            String formhash = getFormhash();
+//            if (!TextUtils.isEmpty(formhash)) {
+//                status = doLogin(formhash);
+            String formhash = "";
+            status = doLogin(formhash);
+//            }
         } else {
             mErrorMsg = "登录信息不完整";
         }
@@ -73,7 +75,7 @@ public class LoginHelper {
         return status;
     }
 
-    private String getFormhash() {
+    public String getFormhash() {
         String rstStr = null;
         try {
             rstStr = OkHttpHelper.getInstance().get(HiUtils.LoginGetFormHash);
@@ -117,7 +119,7 @@ public class LoginHelper {
 
         String rspStr;
         try {
-            rspStr = OkHttpHelper.getInstance().postWithCookie(HiUtils.LoginSubmit, post_param);
+            rspStr = OkHttpHelper.getInstance().post(HiUtils.LoginSubmit, post_param);
             Logger.v(rspStr);
 
             // response is in XML format
