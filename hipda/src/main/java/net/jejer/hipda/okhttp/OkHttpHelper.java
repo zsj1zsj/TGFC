@@ -74,7 +74,8 @@ public class OkHttpHelper {
     private Request buildGetRequest(String url, Object tag) {
         Request.Builder builder = new Request.Builder()
                 .url(url)
-                .header("User-Agent", HiUtils.getUserAgent());
+                .header("User-Agent", HiUtils.getUserAgent())
+                .addHeader("Referer",url);
 
         if (tag != null)
             builder.tag(tag);
@@ -97,6 +98,7 @@ public class OkHttpHelper {
         Request.Builder reqBuilder = new Request.Builder();
         reqBuilder.url(url)
                 .header("User-Agent", HiUtils.getUserAgent())
+                .addHeader("Referer",url)
                 .post(requestBody);
 
         if (tag != null)
@@ -158,7 +160,6 @@ public class OkHttpHelper {
 
     public String post(String url, Map<String, String> params) throws IOException {
         Request request = buildPostFormRequest(url, params, null);
-        Log.d("cookieOT", "post: "+request.headers().get("Cookie"));
         Response response = client.newCall(request).execute();
         return getResponseBody(response);
     }

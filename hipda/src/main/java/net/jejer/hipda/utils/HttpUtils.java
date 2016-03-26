@@ -68,7 +68,7 @@ public class HttpUtils {
         DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
         req.addRequestHeader("User-agent", HiUtils.getUserAgent());
         if (url.startsWith(HiUtils.BaseUrl)) {
-            req.addRequestHeader("Cookie", "cdb_auth=" + authCookie);
+            req.addRequestHeader("Cookie", "tgc_auth=" + authCookie);
         }
         req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);

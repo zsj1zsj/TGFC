@@ -50,8 +50,10 @@ public class OkHttpStreamFetcher implements DataFetcher<InputStream> {
 
     private InputStream getImage() throws IOException {
         Request request = getRequest();
+        request.newBuilder().addHeader("Referer",stringUrl).build();
 
         Response response = client.newCall(request).execute();
+        Logger.v(stringUrl);
         responseBody = response.body();
         if (!response.isSuccessful()) {
             throw new IOException("Request failed with code: " + response.code());
@@ -64,9 +66,11 @@ public class OkHttpStreamFetcher implements DataFetcher<InputStream> {
 
     private InputStream getAvatar() throws IOException {
         File f = GlideHelper.getAvatarFile(stringUrl);
+        Logger.v(stringUrl);
         if (refetch(f)) {
             if (!f.exists() || f.delete()) {
                 Request request = getRequest();
+                request.newBuilder().addHeader("Referer",stringUrl).build();
                 Response response = client.newCall(request).execute();
                 responseBody = response.body();
 
@@ -117,7 +121,8 @@ public class OkHttpStreamFetcher implements DataFetcher<InputStream> {
 
     private Request getRequest() {
         Request.Builder requestBuilder = new Request.Builder()
-                .url(stringUrl);
+                .url(stringUrl)
+                .addHeader("Referer",stringUrl);
 
         for (Map.Entry<String, String> headerEntry : url.getHeaders().entrySet()) {
             String key = headerEntry.getKey();
@@ -128,6 +133,7 @@ public class OkHttpStreamFetcher implements DataFetcher<InputStream> {
         if (isForumUrl) {
             requestBuilder.removeHeader("User-Agent");
             requestBuilder.header("User-Agent", HiUtils.getUserAgent());
+            requestBuilder.addHeader("Referer",stringUrl);
         }
 
         return requestBuilder.build();
