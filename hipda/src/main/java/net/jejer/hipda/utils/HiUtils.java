@@ -52,11 +52,11 @@ public class HiUtils {
     private final static String AVATAR_BASE = "000000000";
     public static int MAX_THREADS_IN_PAGE = 50;
 
-    public final static int FID_BS = 90;
-    public final static int FID_DISCOVERY = 25;
+    public static int FID_DIGIT = 10;
+    public static int FID_BS = 25;
 
-    public final static String[] FORUMS = {"Discovery", "Buy & Sell", "Geek Talks", "E-INK", "PalmOS", "疑似机器人"};
-    public final static int[] FORUM_IDS = {FID_DISCOVERY, FID_BS, 33, 41, 85, 59};
+    public final static String[] FORUMS = {"灌水与情感",  "完全数码讨论区", "游戏业界综合讨论区", "摄影区", "汽车版", "二手交易区"};
+    public final static int[] FORUM_IDS = {90, FID_DIGIT, 33, 41, 59, FID_BS};
     public final static IIcon[] FORUM_ICONS = {
             FontAwesome.Icon.faw_cc_discover,
             FontAwesome.Icon.faw_shopping_cart,
@@ -80,7 +80,7 @@ public class HiUtils {
     }
 
     public static boolean isForumEnabled(int fid) {
-        if (fid == FID_DISCOVERY) {
+        if (fid == FID_DIGIT) {
             return true;
         }
         if (getForumIndexByFid(fid) >= 0) {

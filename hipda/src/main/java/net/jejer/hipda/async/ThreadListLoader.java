@@ -97,7 +97,7 @@ public class ThreadListLoader extends AsyncTaskLoader<ThreadListBean> {
         mHandler.sendMessage(msg);
 
         String mUrl = HiUtils.ThreadListUrl + mForumId + "&page=" + mPage;
-        if (mForumId == HiUtils.FID_BS && TextUtils.isDigitsOnly(HiSettingsHelper.getInstance().getBSTypeId())) {
+        if (mForumId == HiUtils.FID_DIGIT && TextUtils.isDigitsOnly(HiSettingsHelper.getInstance().getBSTypeId())) {
             mUrl += "&filter=type&typeid=" + HiSettingsHelper.getInstance().getBSTypeId();
         }
         if (HiSettingsHelper.getInstance().isSortByPostTime(mForumId)) {

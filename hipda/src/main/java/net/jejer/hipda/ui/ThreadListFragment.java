@@ -105,7 +105,7 @@ public class ThreadListFragment extends BaseFragment
         }
         int forumIdx = HiUtils.getForumIndexByFid(mForumId);
         if (forumIdx == -1 || !HiUtils.isForumEnabled(mForumId)) {
-            mForumId = HiUtils.FID_DISCOVERY;
+            mForumId = HiUtils.FID_DIGIT;
         }
 
         HiSettingsHelper.getInstance().setLastForumId(mForumId);
