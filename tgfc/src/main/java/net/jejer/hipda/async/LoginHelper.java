@@ -139,7 +139,7 @@ public class LoginHelper {
             } else if (rspStr.contains(mCtx.getString(R.string.login_seccode_fail))) {
                 Logger.e("Login FAIL");
                 mErrorMsg = "您输入的验证码不正确，请返回修改。";
-                return Constants.STATUS_FAIL_ABORT;
+                return Constants.STATUS_SECCODE_FAIL_ABORT;
             } else {
                 mErrorMsg = "登录失败,未知错误";
                 return Constants.STATUS_FAIL_ABORT;

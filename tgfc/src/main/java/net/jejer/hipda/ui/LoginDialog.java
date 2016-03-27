@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -75,7 +76,15 @@ public class LoginDialog extends Dialog {
         etPassword.setText(HiSettingsHelper.getInstance().getPassword());
 
         final String SecCodeURL = HiUtils.SecCodeVerifyUrl + Math.random();
-        new DownImgAsyncTask().execute(SecCodeURL);
+
+        etPassword.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                new DownImgAsyncTask().execute(SecCodeURL);
+                return false;
+            }
+        });
+
         ivSecCodeVerify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,10 +142,17 @@ public class LoginDialog extends Dialog {
                             FavoriteHelper.getInstance().updateCache();
                         } else {
                             Toast.makeText(mCtx, loginHelper.getErrorMsg(), Toast.LENGTH_SHORT).show();
-                            HiSettingsHelper.getInstance().setUsername("");
-                            HiSettingsHelper.getInstance().setPassword("");
-                            HiSettingsHelper.getInstance().setSecQuestion("");
-                            HiSettingsHelper.getInstance().setSecAnswer("");
+                            if (result == Constants.STATUS_SECCODE_FAIL_ABORT){
+                                HiSettingsHelper.getInstance().setSecCodeVerity("");
+                                new DownImgAsyncTask().execute(SecCodeURL);
+                            } else {
+                                HiSettingsHelper.getInstance().setUsername("");
+                                HiSettingsHelper.getInstance().setPassword("");
+                                HiSettingsHelper.getInstance().setSecQuestion("");
+                                HiSettingsHelper.getInstance().setSecAnswer("");
+                                HiSettingsHelper.getInstance().setSecCodeVerity("");
+                                new DownImgAsyncTask().execute(SecCodeURL);
+                            }
                             if (mHandler != null) {
                                 Message msg = Message.obtain();
                                 msg.what = ThreadListFragment.STAGE_ERROR;

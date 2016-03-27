@@ -62,7 +62,8 @@ public class UpdateHelper {
         HiSettingsHelper.getInstance().setLastUpdateCheckTime(new Date());
 
         if (mSilent) {
-            doCheck();
+            //// TODO: 16/3/27 检查升级 
+//            doCheck();
         } else {
             new Thread(new Runnable() {
                 @Override
@@ -184,14 +185,14 @@ public class UpdateHelper {
             if (TextUtils.isEmpty(installedVersion)) {
                 // <= v2.0.02
 
-                //add default forums, BS/Eink/Geek
+                //add default forums, 灌水／数码／游戏
                 Set<String> forums = HiSettingsHelper.getInstance().getForums();
-                if (!forums.contains("6"))
-                    forums.add("6");
-                if (!forums.contains("7"))
-                    forums.add("7");
-                if (!forums.contains("59"))
-                    forums.add("59");
+                if (!forums.contains("25"))
+                    forums.add("25");
+                if (!forums.contains("33"))
+                    forums.add("33");
+                if (!forums.contains("10"))
+                    forums.add("10");
                 HiSettingsHelper.getInstance().setForums(forums);
 
                 Utils.clearCache(context);

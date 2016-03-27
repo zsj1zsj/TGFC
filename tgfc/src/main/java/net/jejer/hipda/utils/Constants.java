@@ -11,6 +11,7 @@ public class Constants {
     public static final int STATUS_FAIL = 1;
     public static final int STATUS_IN_PROGRESS = 5;
     public static final int STATUS_FAIL_ABORT = 9;
+    public static final int STATUS_SECCODE_FAIL_ABORT = 8;
 
     public static final int DRAWER_SEARCH = 1000 + SimpleListLoader.TYPE_SEARCH;
     public static final int DRAWER_MYPOST = 1000 + SimpleListLoader.TYPE_MYPOST;

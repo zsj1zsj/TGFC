@@ -33,7 +33,9 @@
             android:layout_height="match_parent"
             android:hint="@string/pref_title_seccodeverify"
             android:ems="4"
-            android:layout_margin="8dp" />
+            android:layout_margin="8dp"
+            android:inputType="text"
+            android:maxLength="4" />
 
         <ImageView
             android:layout_width="325dp"
