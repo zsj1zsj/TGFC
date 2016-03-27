@@ -40,7 +40,7 @@ public class HiUtils {
     public static final String FavoriteAddUrl = BaseUrl + "my.php?item={item}&action=add&inajax=1&ajaxtarget=favorite_msg&tid={tid}";
     public static final String FavoriteRemoveUrl = BaseUrl + "my.php?item={item}&action=remove&inajax=1&ajaxtarget=favorite_msg&tid={tid}";
     public static final String UserInfoUrl = BaseUrl + "space.php?uid=";
-    public static final String AvatarBaseUrl = BaseUrl + "uc_server/data/avatar/";
+    public static final String AvatarBaseUrl = BaseUrl + "customavatars/";
 
     public static final String LoginSubmit = BaseUrl + "logging.php?action=login&loginsubmit=yes&inajax=1";
     public static final String LoginGetFormHash = BaseUrl + "logging.php?action=login&referer=http%3A//club.tgfcer.com/index.php";
@@ -118,6 +118,7 @@ public class HiUtils {
     }
 
     public static String getAvatarUrlByUid(String uid) {
+        /* Hi-Pda Avatar
         if (TextUtils.isEmpty(uid)
                 || uid.length() > AVATAR_BASE.length()
                 || !TextUtils.isDigitsOnly(uid))
@@ -129,6 +130,12 @@ public class HiUtils {
                 + fullUid.substring(3, 5) + "/"
                 + fullUid.substring(5, 7) + "/"
                 + fullUid.substring(7, 9) + "_avatar_middle.jpg";
+        return url;
+        */
+        // TGFC Avatar
+        //TODO 获取链接与论坛自带头像
+
+        String url = AvatarBaseUrl + uid + ".jpg";
         return url;
     }
 

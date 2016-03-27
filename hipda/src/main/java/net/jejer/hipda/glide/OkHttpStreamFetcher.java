@@ -51,6 +51,7 @@ public class OkHttpStreamFetcher implements DataFetcher<InputStream> {
     private InputStream getImage() throws IOException {
         Request request = getRequest();
         request.newBuilder().addHeader("Referer",stringUrl).build();
+        Logger.v(stringUrl);
 
         Response response = client.newCall(request).execute();
         Logger.v(stringUrl);
