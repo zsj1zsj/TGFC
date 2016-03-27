@@ -68,7 +68,7 @@ public class UpdateHelper {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    doCheck();
+//                    doCheck();
                 }
             }).start();
         }
