@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "net.jejer.hipda.ng"
+        applicationId "net.jejer.tgfc.ng"
         minSdkVersion 14
         targetSdkVersion 23
     }

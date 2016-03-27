@@ -22,7 +22,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
  * Created by GreenSkinMonster on 2015-03-28.
  */
 @ReportsCrashes(
-        mailTo = "chartreuse.orc@gmail.com",
+        mailTo = "raymond.liang@outlook.com",
         customReportContent = {ReportField.APP_VERSION_CODE,
                 ReportField.APP_VERSION_NAME,
                 ReportField.ANDROID_VERSION,
