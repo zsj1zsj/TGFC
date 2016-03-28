@@ -90,6 +90,7 @@ public class DetailListLoader extends AsyncTaskLoader<DetailListBean> {
             return null;
         }
 
+
         Document doc = Jsoup.parse(mRsp);
         data = HiParserThreadDetail.parse(mCtx, mHandler, doc, mTid == null);
         return data;
@@ -127,7 +128,7 @@ public class DetailListLoader extends AsyncTaskLoader<DetailListBean> {
             Message msg = Message.obtain();
             msg.what = ThreadListFragment.STAGE_ERROR;
             Bundle b = new Bundle();
-            String text = "无法访问HiPDA : " + OkHttpHelper.getErrorMessage(e);
+            String text = "无法访问TGFC : " + OkHttpHelper.getErrorMessage(e);
             b.putString(ThreadListFragment.STAGE_ERROR_KEY, text);
             msg.setData(b);
             mHandler.sendMessage(msg);

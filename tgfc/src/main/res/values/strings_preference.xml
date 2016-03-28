@@ -141,15 +141,15 @@
         <item>二手交易区</item>
     </string-array>
     <string-array name="pref_title_forum_values">
-        <item>90</item>
+        <item>25</item>
         <item>10</item>
         <item>33</item>
         <item>41</item>
         <item>59</item>
-        <item>25</item>
+        <item>90</item>
     </string-array>
     <string-array name="default_forum_values">
-        <item>90</item>
+        <item>25</item>
         <item>10</item>
         <item>33</item>
     </string-array>

@@ -34,7 +34,7 @@ public class HiParserThreadDetail {
     public static DetailListBean parse(Context ctx, Handler handler, Document doc, boolean parseTid) {
 
         // get last page
-        Elements pagesES = doc.select("div#wrap div.forumcontrol div.pages");
+        Elements pagesES = doc.select("div#wrap div.pages_btns div.pages");
         // thread have only 1 page don't have "div.pages"
         int last_page = 1;
         int page = 1;
@@ -67,7 +67,7 @@ public class HiParserThreadDetail {
         details.setLastPage(last_page);
 
         if (parseTid) {
-            Elements printES = doc.select("div.posterinfo div.pagecontrol a.print");
+            Elements printES = doc.select("div.posterinfo span.headactions a.notabs");
             if (printES.size() > 0) {
                 String tid = HttpUtils.getMiddleString(printES.first().attr("href"), "tid=", "&");
                 if (!TextUtils.isEmpty(tid) && TextUtils.isDigitsOnly(tid))
@@ -76,15 +76,15 @@ public class HiParserThreadDetail {
         }
 
         //get forum id
-        Elements divNavES = doc.select("div#nav");
+        Elements divNavES = doc.select("div#foruminfo div#nav");
         if (divNavES.size() > 0) {
             Elements divNavLinkES = divNavES.first().select("a");
             if (divNavLinkES.size() > 0) {
                 for (int i = 0; i < divNavLinkES.size(); i++) {
                     Element forumLink = divNavLinkES.get(i);
                     String forumUrl = Utils.nullToText(forumLink.attr("href"));
-                    if (forumUrl.indexOf("fid=") > 0) {
-                        details.setFid(HttpUtils.getMiddleString(forumUrl, "fid=", "&"));
+                    if (forumUrl.indexOf("-") > 0) {
+                        details.setFid(HttpUtils.getMiddleString(forumUrl, "forum-", "-"));
                         break;
                     }
                 }
@@ -98,202 +98,216 @@ public class HiParserThreadDetail {
 
         //Title, only avaliable in first page
         if (TextUtils.isEmpty(details.getTitle())) {
-            Elements threadtitleES = doc.select("div#threadtitle");
+            Elements threadtitleES = doc.select("div.viewthread");
             if (threadtitleES.size() > 0) {
                 threadtitleES.select("a").remove();
                 details.setTitle(threadtitleES.first().text());
             }
         }
 
-        Elements rootES = doc.select("div#wrap div#postlist");
+        Elements rootES = doc.select("form[name=\"modactions\"]");
         if (rootES.size() != 1) {
             return null;
         }
+        rootES.select("input").remove();
+        rootES.select(".ad_column").remove();
+
         Element postsEL = rootES.first();
+        for(int i=0;i<postsEL.childNodes().size();i++){
+            if((postsEL.childNode(i).toString().indexOf("viewthread")) < 0){
+                postsEL.childNode(i).remove();
+            }
+        }
         for (int i = 0; i < postsEL.childNodeSize(); i++) {
             Element postE = postsEL.child(i);
+            if (postE.hasClass("viewthread")) {
 
-            DetailBean detail = new DetailBean();
+                DetailBean detail = new DetailBean();
 
-            //id
-            String id = postE.attr("id");
-            if (id.length() < "post_".length()) {
-                continue;
-            }
-            id = id.substring("post_".length());
-            detail.setPostId(id);
-
-            //time
-            Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo div.posterinfo div.authorinfo em");
-            if (timeEMES.size() == 0) {
-                continue;
-            }
-            String time = timeEMES.first().text();
-            detail.setTimePost(time);
-
-            //floor
-            Elements postinfoAES = postE.select("table tbody tr td.postcontent div.postinfo strong a em");
-            if (postinfoAES.size() == 0) {
-                continue;
-            }
-            String floor = postinfoAES.first().text();
-            detail.setFloor(floor);
-
-            //update max posts in page, this is controlled by user setting
-            if (i == 0) {
-                if (page == 1 && last_page > 1) {
-                    HiSettingsHelper.getInstance().setMaxPostsInPage(postsEL.childNodeSize());
-                } else if (page > 1) {
-                    int maxPostsInPage = (Integer.parseInt(floor) - 1) / (page - 1);
-                    HiSettingsHelper.getInstance().setMaxPostsInPage(maxPostsInPage);
+                //id
+                String id = postE.select("table").attr("id");
+                if (id.length() < "pid".length()) {
+                    continue;
                 }
-            }
+                id = id.substring("pid".length());
+                detail.setPostId(id);
 
-            //author
-            Elements postauthorAES = postE.select("table tbody tr td.postauthor div.postinfo a");
-            if (postauthorAES.size() == 0) {
-                continue;
-            }
-            String uidUrl = postauthorAES.first().attr("href");
-            String uid = HttpUtils.getMiddleString(uidUrl, "uid=", "&");
-            if (uid != null) {
-                detail.setUid(uid);
-            } else {
-                continue;
-            }
+                //time
+                Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo");
+                timeEMES.remove("em");
+                timeEMES.remove("a");
+                if (timeEMES.size() == 0) {
+                    continue;
+                }
+                String time = timeEMES.first().text();
+                detail.setTimePost(time);
 
-            String author = postauthorAES.first().text();
-            if (!detail.setAuthor(author)) {
-                detail.setAuthor("[[黑名单用户]]");
-                details.add(detail);
-                continue;
-            }
+                //floor
+                Elements postinfoAES = postE.select("table tbody tr td.postcontent div.postinfo strong");
+                postinfoAES.remove("sup");
+                if (postinfoAES.size() == 0) {
+                    continue;
+                }
+                String floor = postinfoAES.first().text();
+                detail.setFloor(floor);
 
-            //avatar
-            Elements avatarES = postE.select("table tbody tr td.postauthor div div.avatar a img");
-            if (avatarES.size() == 0) {
-                // avatar display can be closed by user
-                detail.setAvatarUrl("noavatar");
-            } else {
-                detail.setAvatarUrl(avatarES.first().attr("src"));
-            }
+                //update max posts in page, this is controlled by user setting
+                if (i == 0) {
+                    if (page == 1 && last_page > 1) {
+                        HiSettingsHelper.getInstance().setMaxPostsInPage(postsEL.childNodeSize());
+                    } else if (page > 1) {
+                        int maxPostsInPage = (Integer.parseInt(floor) - 1) / (page - 1);
+                        HiSettingsHelper.getInstance().setMaxPostsInPage(maxPostsInPage);
+                    }
+                }
 
-            //content
-            Contents content = detail.getContents();
-            Elements postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.t_msgfontfix table tbody tr td.t_msgfont");
+                //author
+                Elements postauthorAES = postE.select("table tbody tr td.postauthor cite a");
+                if (postauthorAES.size() == 0) {
+                    continue;
+                }
+                String uidUrl = postauthorAES.first().attr("href");
+                String uid = HttpUtils.getMiddleString(uidUrl, "uid-", ".");
+                Logger.v(uid);
+                if (uid != null) {
+                    detail.setUid(uid);
+                } else {
+                    continue;
+                }
 
-            //locked user content
-            if (postmessageES.size() == 0) {
-                postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.locked");
-                if (postmessageES.size() > 0) {
-                    content.addNotice(postmessageES.text());
+                String author = postauthorAES.first().text();
+                if (!detail.setAuthor(author)) {
+                    detail.setAuthor("[[黑名单用户]]");
                     details.add(detail);
                     continue;
                 }
-            }
 
-            //poll content
-            boolean isPollFirstPost = false;
-            if (postmessageES.size() == 0) {
-                postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.specialmsg table tbody tr td.t_msgfont");
-                isPollFirstPost = "1".equals(floor);
-            }
-            if (isPollFirstPost) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.pollinfo").text()).append("<br>");
-                Elements pollOptions = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.pollchart table  tbody tr");
-                for (int j = 0; j < pollOptions.size(); j++) {
-                    if (j % 2 == 0 && j < pollOptions.size() - 1)
-                        sb.append(pollOptions.get(j).text());
-                    if (j % 2 == 1)
-                        sb.append(pollOptions.get(j).text()).append("<br>");
-                }
-                sb.append("<br>");
-                content.addText(sb.toString());
-            }
-
-            if (postmessageES.size() == 0) {
-                content.addNotice("[[!!找不到帖子内容，可能是该帖被管理员或版主屏蔽!!]]");
-                details.add(detail);
-                continue;
-            }
-
-            Element postmessageE = postmessageES.first();
-            if (postmessageE.childNodeSize() == 0) {
-                content.addNotice("[[无内容]]");
-                details.add(detail);
-                continue;
-            }
-
-            //post status
-            Elements poststatusES = postmessageE.select("i.pstatus");
-            if (poststatusES.size() > 0) {
-                String poststatus = poststatusES.first().text();
-                detail.setPostStatus(poststatus);
-                //remove then it will not show in content
-                poststatusES.first().remove();
-            }
-
-            // Nodes including Elements(have tag) and text without tag
-            TextStyleHolder textStyles = new TextStyleHolder();
-            Node contentN = postmessageE.childNode(0);
-            int level = 1;
-            boolean processChildren;
-            while (level > 0 && contentN != null) {
-
-                textStyles.addLevel(level);
-
-                processChildren = parseNode(contentN, content, level, textStyles);
-
-                if (processChildren && contentN.childNodeSize() > 0) {
-                    contentN = contentN.childNode(0);
-                    level++;
-                } else if (contentN.nextSibling() != null) {
-                    contentN = contentN.nextSibling();
-                    textStyles.removeLevel(level);
+                //avatar
+                Elements avatarES = postE.select("table tbody tr td.postauthor div.avatar img");
+                if (avatarES.size() == 0) {
+                    // avatar display can be closed by user
+                    detail.setAvatarUrl("noavatar");
                 } else {
-                    while (contentN.parent().nextSibling() == null) {
-                        contentN = contentN.parent();
+                    detail.setAvatarUrl(avatarES.first().attr("src"));
+                }
+
+                //content
+                Contents content = detail.getContents();
+                Elements postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.t_msgfont");
+
+                //locked user content
+                if (postmessageES.size() == 0) {
+                    postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.locked");
+                    if (postmessageES.size() > 0) {
+                        content.addNotice(postmessageES.text());
+                        details.add(detail);
+                        continue;
+                    }
+                }
+
+                //poll content
+                boolean isPollFirstPost = false;
+                if (postmessageES.size() == 0) {
+                    postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.specialmsg table tbody tr td.t_msgfont");
+                    isPollFirstPost = "1".equals(floor);
+                }
+                if (isPollFirstPost) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.pollinfo").text()).append("<br>");
+                    Elements pollOptions = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.pollchart table  tbody tr");
+                    for (int j = 0; j < pollOptions.size(); j++) {
+                        if (j % 2 == 0 && j < pollOptions.size() - 1)
+                            sb.append(pollOptions.get(j).text());
+                        if (j % 2 == 1)
+                            sb.append(pollOptions.get(j).text()).append("<br>");
+                    }
+                    sb.append("<br>");
+                    content.addText(sb.toString());
+                }
+
+                if (postmessageES.size() == 0) {
+                    content.addNotice("[[!!找不到帖子内容，可能是该帖被管理员或版主屏蔽!!]]");
+                    details.add(detail);
+                    continue;
+                }
+
+                Element postmessageE = postmessageES.first();
+                if (postmessageE.childNodeSize() == 0) {
+                    content.addNotice("[[无内容]]");
+                    details.add(detail);
+                    continue;
+                }
+
+                //post status
+                Elements poststatusES = postmessageE.select("i");
+                if (poststatusES.size() > 0) {
+                    String poststatus = poststatusES.first().text();
+                    detail.setPostStatus(poststatus);
+                    //remove then it will not show in content
+                    poststatusES.first().remove();
+                }
+
+                // Nodes including Elements(have tag) and text without tag
+                TextStyleHolder textStyles = new TextStyleHolder();
+                Node contentN = postmessageE.childNode(0);
+                int level = 1;
+                boolean processChildren;
+                while (level > 0 && contentN != null) {
+
+                    textStyles.addLevel(level);
+
+                    processChildren = parseNode(contentN, content, level, textStyles);
+
+                    if (processChildren && contentN.childNodeSize() > 0) {
+                        contentN = contentN.childNode(0);
+                        level++;
+                    } else if (contentN.nextSibling() != null) {
+                        contentN = contentN.nextSibling();
+                        textStyles.removeLevel(level);
+                    } else {
+                        while (contentN.parent().nextSibling() == null) {
+                            contentN = contentN.parent();
+                            textStyles.removeLevel(level);
+                            textStyles.removeLevel(level - 1);
+                            level--;
+                        }
+                        contentN = contentN.parent().nextSibling();
                         textStyles.removeLevel(level);
                         textStyles.removeLevel(level - 1);
                         level--;
                     }
-                    contentN = contentN.parent().nextSibling();
-                    textStyles.removeLevel(level);
-                    textStyles.removeLevel(level - 1);
-                    level--;
                 }
-            }
 
-            // IMG attachments
-            Elements postimgES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.t_msgfontfix div.postattachlist img");
-            for (int j = 0; j < postimgES.size(); j++) {
-                Element imgE = postimgES.get(j);
-                if (imgE.attr("file").startsWith("attachments/day_") || imgE.attr("file").startsWith("attachment.php")) {
-                    content.addImg(imgE.attr("file"), imgE.attr("id"), true);
-                }
-            }
-
-            // other attachments
-            Elements attachmentES = postE.select("dl.t_attachlist p.attachname");
-            for (int j = 0; j < attachmentES.size(); j++) {
-                Element attachE = attachmentES.get(j);
-                Elements attachLinkES = attachE.select("a[href]");
-
-                if (attachLinkES.size() > 0) {
-                    Element linkE = attachLinkES.first();
-                    if (linkE.attr("href").startsWith("attachment.php?")) {
-                        attachLinkES.remove();
-                        String desc = attachE.text();
-
-                        if (j == 0)
-                            content.addText("<br>");
-                        content.addAttach(linkE.attr("href"), linkE.text(), desc);
+                // IMG attachments
+                Elements postimgES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.postattachlist img");
+                for (int j = 0; j < postimgES.size(); j++) {
+                    Element imgE = postimgES.get(j);
+                    if (imgE.attr("file").startsWith("attachments/day_") || imgE.attr("file").startsWith("attachment.php")) {
+                        content.addImg(imgE.attr("file"), imgE.attr("id"), true);
                     }
                 }
+
+                // other attachments
+                Elements attachmentES = postE.select("dl.t_attachlist p.attachname");
+                for (int j = 0; j < attachmentES.size(); j++) {
+                    Element attachE = attachmentES.get(j);
+                    Elements attachLinkES = attachE.select("a[href]");
+
+                    if (attachLinkES.size() > 0) {
+                        Element linkE = attachLinkES.first();
+                        if (linkE.attr("href").startsWith("attachment.php?")) {
+                            attachLinkES.remove();
+                            String desc = attachE.text();
+
+                            if (j == 0)
+                                content.addText("<br>");
+                            content.addAttach(linkE.attr("href"), linkE.text(), desc);
+                        }
+                    }
+                }
+                details.add(detail);
             }
 
-            details.add(detail);
         }
         return details;
     }
