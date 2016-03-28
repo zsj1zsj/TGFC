@@ -34,8 +34,9 @@ public class HiParserThreadDetail {
     public static DetailListBean parse(Context ctx, Handler handler, Document doc, boolean parseTid) {
 
         // get last page
-        Elements pagesES = doc.select("div#wrap div.pages_btns div.pages");
+        Elements pagesES = doc.select("div.wrap div.pages_btns div.pages");
         // thread have only 1 page don't have "div.pages"
+        pagesES.select("em").remove();
         int last_page = 1;
         int page = 1;
         if (pagesES.size() != 0) {
@@ -109,19 +110,12 @@ public class HiParserThreadDetail {
         if (rootES.size() != 1) {
             return null;
         }
-        rootES.select("input").remove();
-        rootES.select(".ad_column").remove();
+//        rootES.select("input").remove();
+//        rootES.select(".ad_column").remove();
 
-        Element postsEL = rootES.first();
-        for(int i=0;i<postsEL.childNodes().size();i++){
-            if((postsEL.childNode(i).toString().indexOf("viewthread")) < 0){
-                postsEL.childNode(i).remove();
-            }
-        }
-        for (int i = 0; i < postsEL.childNodeSize(); i++) {
-            Element postE = postsEL.child(i);
-            if (postE.hasClass("viewthread")) {
-
+        Elements postsEL = rootES.select("div.viewthread");
+        for (int i = 0; i < postsEL.size(); i++) {
+            Element postE = postsEL.get(i);
                 DetailBean detail = new DetailBean();
 
                 //id
@@ -133,9 +127,10 @@ public class HiParserThreadDetail {
                 detail.setPostId(id);
 
                 //time
-                Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo");
-                timeEMES.remove("em");
-                timeEMES.remove("a");
+                Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo").clone();
+                timeEMES.select("strong").remove();
+                timeEMES.select("em").remove();
+                timeEMES.select("a").remove();
                 if (timeEMES.size() == 0) {
                     continue;
                 }
@@ -148,13 +143,13 @@ public class HiParserThreadDetail {
                 if (postinfoAES.size() == 0) {
                     continue;
                 }
-                String floor = postinfoAES.first().text();
+                String floor = postinfoAES.first().text().replace("#","");
                 detail.setFloor(floor);
 
                 //update max posts in page, this is controlled by user setting
                 if (i == 0) {
                     if (page == 1 && last_page > 1) {
-                        HiSettingsHelper.getInstance().setMaxPostsInPage(postsEL.childNodeSize());
+                        HiSettingsHelper.getInstance().setMaxPostsInPage(postsEL.size());
                     } else if (page > 1) {
                         int maxPostsInPage = (Integer.parseInt(floor) - 1) / (page - 1);
                         HiSettingsHelper.getInstance().setMaxPostsInPage(maxPostsInPage);
@@ -193,7 +188,7 @@ public class HiParserThreadDetail {
 
                 //content
                 Contents content = detail.getContents();
-                Elements postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.t_msgfont");
+                Elements postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.t_msgfont");
 
                 //locked user content
                 if (postmessageES.size() == 0) {
@@ -279,11 +274,12 @@ public class HiParserThreadDetail {
                 }
 
                 // IMG attachments
-                Elements postimgES = postE.select("table tbody tr td.postcontent div.defaultpost div.postmessage div.postattachlist img");
+                Elements postimgES = postE.select("table tbody tr td.postcontent div.postmessage img");
                 for (int j = 0; j < postimgES.size(); j++) {
                     Element imgE = postimgES.get(j);
-                    if (imgE.attr("file").startsWith("attachments/day_") || imgE.attr("file").startsWith("attachment.php")) {
-                        content.addImg(imgE.attr("file"), imgE.attr("id"), true);
+//                    if (imgE.attr("file").startsWith("attachments/day_") || imgE.attr("file").startsWith("attachment.php")) {
+                    if(imgE.attr("onclick").startsWith("zoom(this")){
+                        content.addImg(imgE.attr("src"), imgE.attr("onmouseout").replace("attachimginfo(this, '","").replace("', 0, event)",""), true);
                     }
                 }
 
@@ -306,8 +302,6 @@ public class HiParserThreadDetail {
                     }
                 }
                 details.add(detail);
-            }
-
         }
         return details;
     }
