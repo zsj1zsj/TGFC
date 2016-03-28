@@ -110,8 +110,6 @@ public class HiParserThreadDetail {
         if (rootES.size() != 1) {
             return null;
         }
-//        rootES.select("input").remove();
-//        rootES.select(".ad_column").remove();
 
         Elements postsEL = rootES.select("div.viewthread");
         for (int i = 0; i < postsEL.size(); i++) {
@@ -234,15 +232,26 @@ public class HiParserThreadDetail {
                 }
 
                 //post status
+            String poststatus = "";
                 Elements poststatusES = postmessageE.select("i");
                 if (poststatusES.size() > 0) {
-                    String poststatus = poststatusES.first().text();
+                    poststatus = poststatusES.first().text();
                     detail.setPostStatus(poststatus);
                     //remove then it will not show in content
                     poststatusES.first().remove();
                 }
 
-                // Nodes including Elements(have tag) and text without tag
+            //wap platform
+            Elements postplatformES = postmessageE.select("font[color=DarkRed] font[size=2]");
+            if (postplatformES.size() > 0) {
+                String postplatform = postplatformES.first().text();
+                detail.setPostStatus(poststatus+" "+postplatform);
+                //remove then it will not show in content
+                postplatformES.first().remove();
+            }
+
+
+            // Nodes including Elements(have tag) and text without tag
                 TextStyleHolder textStyles = new TextStyleHolder();
                 Node contentN = postmessageE.childNode(0);
                 int level = 1;
@@ -277,9 +286,8 @@ public class HiParserThreadDetail {
                 Elements postimgES = postE.select("table tbody tr td.postcontent div.postmessage img");
                 for (int j = 0; j < postimgES.size(); j++) {
                     Element imgE = postimgES.get(j);
-//                    if (imgE.attr("file").startsWith("attachments/day_") || imgE.attr("file").startsWith("attachment.php")) {
-                    if(imgE.attr("onclick").startsWith("zoom(this")){
-                        content.addImg(imgE.attr("src"), imgE.attr("onmouseout").replace("attachimginfo(this, '","").replace("', 0, event)",""), true);
+                    if(imgE.attr("onclick").startsWith("zoom(this") && !imgE.attr("src").contains("/images/common")){
+                        content.addImg(imgE.attr("src"), imgE.attr("onmouseout").replace("attachimginfo(this, \'","").replace("\', 0, event)",""), true);
                     }
                 }
 
@@ -406,7 +414,7 @@ public class HiParserThreadDetail {
                 return false;
             } else if (src.equals("images/common/none.gif") || src.startsWith("attachments/day_") || src.startsWith("attachment.php")) {
                 //internal image
-                content.addImg(e.attr("file"), e.attr("id"), true);
+                content.addImg(e.attr("src"), e.attr("onmouseout").replace("attachimginfo(this, \'","").replace("\', 0, event)",""), true);
                 return false;
             } else if (src.equals("images/common/")) {
                 //skip common icons
