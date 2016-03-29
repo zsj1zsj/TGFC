@@ -53,17 +53,17 @@ public class HiUtils {
     public static int MAX_THREADS_IN_PAGE = 50;
 
     public static int FID_DIGIT = 10;
-    public static int FID_BS = 25;
+    public static int FID_BS = 90;
 
     public final static String[] FORUMS = {"灌水与情感",  "完全数码讨论区", "游戏业界综合讨论区", "摄影区", "汽车版", "二手交易区"};
-    public final static int[] FORUM_IDS = {90, FID_DIGIT, 33, 41, 59, FID_BS};
+    public final static int[] FORUM_IDS = {25, FID_DIGIT, 33, 41, 59, FID_BS};
     public final static IIcon[] FORUM_ICONS = {
-            FontAwesome.Icon.faw_cc_discover,
-            FontAwesome.Icon.faw_shopping_cart,
-            FontAwesome.Icon.faw_forumbee,
-            FontAwesome.Icon.faw_book,
+            FontAwesome.Icon.faw_anchor,
             FontAwesome.Icon.faw_mobile_phone,
-            FontAwesome.Icon.faw_reddit
+            FontAwesome.Icon.faw_gamepad,
+            FontAwesome.Icon.faw_camera,
+            FontAwesome.Icon.faw_car,
+            FontAwesome.Icon.faw_shopping_cart
     };
 
     public static int getForumID(int idx) {

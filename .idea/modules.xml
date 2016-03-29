@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/TGFC.iml" filepath="$PROJECT_DIR$/TGFC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/tgfc/hipda.iml" filepath="$PROJECT_DIR$/tgfc/hipda.iml" />
       <module fileurl="file://$PROJECT_DIR$/tgfc/tgfc.iml" filepath="$PROJECT_DIR$/tgfc/tgfc.iml" />
     </modules>
   </component>

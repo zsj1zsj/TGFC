@@ -181,7 +181,11 @@ public class HiParserThreadDetail {
                     // avatar display can be closed by user
                     detail.setAvatarUrl("noavatar");
                 } else {
-                    detail.setAvatarUrl(avatarES.first().attr("src"));
+                    if (avatarES.first().attr("src").startsWith("http")) {
+                        detail.setAvatarUrl(avatarES.first().attr("src"));
+                    } else {
+                        detail.setAvatarUrl(HiUtils.BaseUrl+avatarES.first().attr("src"));
+                    }
                 }
 
                 //content
@@ -283,14 +287,15 @@ public class HiParserThreadDetail {
                 }
 
                 // IMG attachments
+/*
                 Elements postimgES = postE.select("table tbody tr td.postcontent div.postmessage img");
                 for (int j = 0; j < postimgES.size(); j++) {
                     Element imgE = postimgES.get(j);
                     if(imgE.attr("onclick").startsWith("zoom(this") && !imgE.attr("src").contains("/images/common")){
-                        content.addImg(imgE.attr("src"), imgE.attr("onmouseout").replace("attachimginfo(this, \'","").replace("\', 0, event)",""), true);
+                        content.addImg(imgE.attr("src"), imgE.attr("src").substring(imgE.attr("src").lastIndexOf("/")+1), true);
                     }
                 }
-
+*/
                 // other attachments
                 Elements attachmentES = postE.select("dl.t_attachlist p.attachname");
                 for (int j = 0; j < attachmentES.size(); j++) {
@@ -410,11 +415,11 @@ public class HiParserThreadDetail {
             if (src.startsWith(HiUtils.SMILE_PATH)
                     || SmallImages.contains(src)) {
                 //emotion added as img tag, will be parsed in TextViewWithEmoticon later
-                content.addText("<img src=\"" + src + "\"/>");
+                content.addText("<img src=\"" + HiUtils.BaseUrl + src + "\"/>");
                 return false;
             } else if (src.equals("images/common/none.gif") || src.startsWith("attachments/day_") || src.startsWith("attachment.php")) {
                 //internal image
-                content.addImg(e.attr("src"), e.attr("onmouseout").replace("attachimginfo(this, \'","").replace("\', 0, event)",""), true);
+                content.addImg(e.attr("src"), e.attr("src").substring(e.attr("src").lastIndexOf("/")+1), true);
                 return false;
             } else if (src.equals("images/common/")) {
                 //skip common icons

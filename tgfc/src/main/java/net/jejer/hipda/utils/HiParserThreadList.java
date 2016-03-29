@@ -171,7 +171,8 @@ public class HiParserThreadList {
                     thread.setHavePic(true);
                 }
                 if (attach_img_url.endsWith("common.gif")) {
-                    thread.setHaveAttach(true);
+//                    thread.setHaveAttach(true);
+                    thread.setHavePic(true);
                 }
             }
 
