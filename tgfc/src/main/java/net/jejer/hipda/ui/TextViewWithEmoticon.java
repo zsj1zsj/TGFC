@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 import net.jejer.hipda.bean.DetailBean;
 import net.jejer.hipda.bean.HiSettingsHelper;
 import net.jejer.hipda.cache.SmallImages;
@@ -25,6 +27,11 @@ import net.jejer.hipda.utils.HiUtils;
 import net.jejer.hipda.utils.HttpUtils;
 import net.jejer.hipda.utils.Logger;
 import net.jejer.hipda.utils.Utils;
+
+import java.io.IOException;
+
+import pl.droidsonroids.gif.GifDrawable;
+
 
 public class TextViewWithEmoticon extends TextView {
     private Context mCtx;
@@ -80,8 +87,9 @@ public class TextViewWithEmoticon extends TextView {
     }
 
     private Html.ImageGetter imageGetter = new Html.ImageGetter() {
-        public Drawable getDrawable(String src) {
+        public GifDrawable getDrawable(String src) {
             Drawable icon = null;
+            GifDrawable gifIcon = null;
             src = Utils.nullToText(src);
             if (SmallImages.contains(src)) {
                 icon = ContextCompat.getDrawable(mCtx, SmallImages.getDrawable(src));
@@ -92,13 +100,17 @@ public class TextViewWithEmoticon extends TextView {
                     src = src.substring(src.indexOf(HiUtils.SMILE_PATH) + HiUtils.SMILE_PATH.length(), src.lastIndexOf(".")).replace("/", "_");
                     int id = mCtx.getResources().getIdentifier(src, "drawable", mCtx.getPackageName());
                     if (id != 0) {
-                        icon = ContextCompat.getDrawable(mCtx, id);
-                        if (icon != null)
-                            icon.setBounds(0, 0, getLineHeight(), getLineHeight());
+                        try {
+                            gifIcon = new GifDrawable( getResources(), id );
+//                            gifIcon.setBounds(0, 0, getLineHeight(), getLineHeight());
+                            gifIcon.setBounds(0, 0, gifIcon.getIntrinsicWidth(), gifIcon.getIntrinsicHeight());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
-            return icon;
+            return gifIcon;
         }
     };
 

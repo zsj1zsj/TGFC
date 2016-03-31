@@ -192,6 +192,18 @@ public class FragmentUtils {
         showFragment(fragmentManager, fragment, directOpen);
     }
 
+    public static void showThreadNotifyDetail(FragmentManager fragmentManager, boolean directOpen, String url, String title, String avatarUrl, String author, String time) {
+        Bundle notifyDetailBundle = new Bundle();
+        notifyDetailBundle.putString(NotifyDetailFragment.ARG_AUTHOR, author);
+        notifyDetailBundle.putString(NotifyDetailFragment.ARG_AVATAR_URL, avatarUrl);
+        notifyDetailBundle.putString(NotifyDetailFragment.ARG_TITLE, title);
+        notifyDetailBundle.putString(NotifyDetailFragment.ARG_INFO_URL, url);
+        notifyDetailBundle.putString(NotifyDetailFragment.ARG_TIME, time);
+        NotifyDetailFragment fragment = new NotifyDetailFragment();
+        fragment.setArguments(notifyDetailBundle);
+        showFragment(fragmentManager, fragment, directOpen);
+    }
+
     public static void showSmsList(FragmentManager fragmentManager, boolean directOpen) {
         Bundle smsBundle = new Bundle();
         smsBundle.putInt(SimpleListFragment.ARG_TYPE, SimpleListLoader.TYPE_SMS);

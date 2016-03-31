@@ -28,9 +28,9 @@ public class HiUtils {
     public static final String SMSPreparePostUrl = BaseUrl + "pm.php?daterange=1&uid=";
     public static final String SMSPostByUid = BaseUrl + "pm.php?action=send&pmsubmit=yes&infloat=yes&inajax=1&uid={uid}";
     public static final String SMSPostByUsername = BaseUrl + "pm.php?action=send&pmsubmit=yes&infloat=yes&inajax=1";
-    public static final String ThreadNotifyUrl = BaseUrl + "notice.php?filter=threads";
+    public static final String ThreadNotifyUrl = BaseUrl + "pm.php?folder=inbox";
     public static final String CheckSMS = BaseUrl + "pm.php?checknewpm";
-    public static final String NewSMS = BaseUrl + "pm.php?filter=newpm";
+    public static final String NewSMS = BaseUrl + "pm.php?folder=inbox";
     public static final String ClearSMS = BaseUrl + "pm.php?action=del&uid={uid}&filter=privatepm";
     public static final String UploadImgUrl = BaseUrl + "misc.php?action=swfupload&operation=upload&simple=1&type=image";
     public static final String SearchTitle = BaseUrl + "search.php?srchtype=title&searchsubmit=true&st=on&srchuname=&srchfilter=all&srchfrom=0&before=&orderby=lastpost&ascdesc=desc&srchfid%5B0%5D=all&srchtxt=";

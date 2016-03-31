@@ -48,4 +48,5 @@ dependencies {
         exclude group: 'org.json'
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.15'
 }

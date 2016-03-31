@@ -12,6 +12,7 @@ public class SimpleListItemBean {
     private String mUid;
     private String mAuthor;
     private String mAvatarUrl = "";
+    private String mDetailUrl;
     private boolean mNew = false;
 
     public String getUid() {
@@ -95,6 +96,14 @@ public class SimpleListItemBean {
             this.mAvatarUrl = "";
         }
         mAvatarUrl = avatarUrl.replace("small", "middle");
+    }
+
+    public String getDetailUrl() {
+        return mDetailUrl;
+    }
+
+    public void setDetailUrl(String detailUrl) {
+        mDetailUrl = detailUrl;
     }
 
 }

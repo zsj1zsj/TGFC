@@ -287,15 +287,15 @@ public class HiParserThreadDetail {
                 }
 
                 // IMG attachments
-/*
-                Elements postimgES = postE.select("table tbody tr td.postcontent div.postmessage img");
+
+                Elements postimgES = postE.select("table tbody tr td.postcontent div.postmessage div.postattachlist img");
                 for (int j = 0; j < postimgES.size(); j++) {
                     Element imgE = postimgES.get(j);
-                    if(imgE.attr("onclick").startsWith("zoom(this") && !imgE.attr("src").contains("/images/common")){
+                    if(imgE.attr("onclick").startsWith("zoom(this") && !imgE.attr("src").contains("images/attachicons")){
                         content.addImg(imgE.attr("src"), imgE.attr("src").substring(imgE.attr("src").lastIndexOf("/")+1), true);
                     }
                 }
-*/
+
                 // other attachments
                 Elements attachmentES = postE.select("dl.t_attachlist p.attachname");
                 for (int j = 0; j < attachmentES.size(); j++) {

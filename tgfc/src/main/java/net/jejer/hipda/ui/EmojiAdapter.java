@@ -33,6 +33,7 @@ public class EmojiAdapter extends BaseAdapter {
 
         switch (tab) {
             case 1:
+                /*
                 mImgArray.append(0, new EmojiBean(R.drawable.default_smile, " :) "));
                 mImgArray.append(1, new EmojiBean(R.drawable.default_sweat, " :sweat: "));
                 mImgArray.append(2, new EmojiBean(R.drawable.default_huffy, " :huffy: "));
@@ -54,8 +55,10 @@ public class EmojiAdapter extends BaseAdapter {
                 mImgArray.append(18, new EmojiBean(R.drawable.default_lol, " :lol: "));
                 mImgArray.append(19, new EmojiBean(R.drawable.default_shy, " :shy: "));
                 mImgArray.append(20, new EmojiBean(R.drawable.default_sleepy, " :sleepy: "));
+                */
                 break;
             case 2:
+                /*
                 mImgArray.append(0, new EmojiBean(R.drawable.coolmonkey_01, " {:2_41:} "));
                 mImgArray.append(1, new EmojiBean(R.drawable.coolmonkey_02, " {:2_42:} "));
                 mImgArray.append(2, new EmojiBean(R.drawable.coolmonkey_03, " {:2_43:} "));
@@ -72,8 +75,10 @@ public class EmojiAdapter extends BaseAdapter {
                 mImgArray.append(13, new EmojiBean(R.drawable.coolmonkey_14, " {:2_54:} "));
                 mImgArray.append(14, new EmojiBean(R.drawable.coolmonkey_15, " {:2_55:} "));
                 mImgArray.append(15, new EmojiBean(R.drawable.coolmonkey_16, " {:2_56:} "));
+                */
                 break;
             case 3:
+                /*
                 mImgArray.append(0, new EmojiBean(R.drawable.grapeman_01, " {:3_57:} "));
                 mImgArray.append(1, new EmojiBean(R.drawable.grapeman_02, " {:3_58:} "));
                 mImgArray.append(2, new EmojiBean(R.drawable.grapeman_03, " {:3_59:} "));
@@ -98,6 +103,7 @@ public class EmojiAdapter extends BaseAdapter {
                 mImgArray.append(21, new EmojiBean(R.drawable.grapeman_22, " {:3_78:} "));
                 mImgArray.append(22, new EmojiBean(R.drawable.grapeman_23, " {:3_79:} "));
                 mImgArray.append(23, new EmojiBean(R.drawable.grapeman_24, " {:3_80:} "));
+                */
                 break;
         }
     }

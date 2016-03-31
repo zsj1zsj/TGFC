@@ -205,13 +205,13 @@ public class HiParser {
             return null;
         }
 
-        Elements pmlistES = doc.select("ul.pm_list");
+        Elements pmlistES = doc.select("table#pmlist tbodys");
         if (pmlistES.size() < 1) {
             return null;
         }
 
         SimpleListBean list = new SimpleListBean();
-        Elements liES = pmlistES.first().select("li");
+        Elements liES = pmlistES.first().select("tr");
         for (int i = 0; i < liES.size(); ++i) {
             Element liE = liES.get(i);
             SimpleListItemBean item = new SimpleListItemBean();
@@ -226,11 +226,13 @@ public class HiParser {
             }
 
             // author and author uid
-            Elements pciteES = liE.select("p.cite");
+            Element pciteES = liE.select("td").get(2);
+            /*
             if (pciteES.size() == 0) {
                 continue;
             }
-            Elements citeES = pciteES.first().select("cite");
+            */
+            Elements citeES = pciteES.select("a");
             if (citeES.size() == 0) {
                 continue;
             }
@@ -241,25 +243,29 @@ public class HiParser {
                 continue;
             }
             String uid = uidAES.first().attr("href");
-            item.setUid(HttpUtils.getMiddleString(uid, "uid=", "&"));
+            item.setUid(HttpUtils.getMiddleString(uid, "uid-", "&"));
 
             // time
-            item.setTime(pciteES.first().ownText());
+            item.setTime(liE.select("td").get(3).ownText());
 
             // new
+            /*
             Elements imgES = pciteES.first().select("img");
             if (imgES.size() > 0) {
                 if (imgES.first().attr("src").equals("images/default/notice_newpm.gif")) {
                     item.setNew(true);
                 }
             }
+            */
+            Element newES = liE.select("td").get(1);
+            if (newES.attr("style") == "font-weight:800"){
+                item.setNew(true);
+            }
 
             // info
-            Elements summaryES = liE.select("div.summary");
-            if (summaryES.size() == 0) {
-                continue;
-            }
-            item.setTitle(summaryES.first().text());
+            Element summaryES = liE.select("td a").get(0);
+
+            item.setTitle(summaryES.text());
 
             list.add(item);
         }
@@ -272,16 +278,16 @@ public class HiParser {
             return null;
         }
 
-        Elements feedES = doc.select("ul.feed");
+        Elements feedES = doc.select("table#pmlist tbody");
         if (feedES.size() == 0) {
             return null;
         }
 
         SimpleListBean list = new SimpleListBean();
-        Elements liES = feedES.first().select("li");
-        for (int i = 0; i < liES.size(); ++i) {
+        Elements liES = feedES.first().select("tr");
+        for (int i = 0; i < liES.size() && i < 15; ++i) {
             Element liE = liES.get(i);
-            Elements divES = liE.select("div");
+            Elements divES = liE.select("td");
             if (divES.size() == 0) {
                 continue;
             }
@@ -289,12 +295,12 @@ public class HiParser {
             if (divES.first().hasClass("f_thread")) {
                 // user reply your thread
                 item = parseNotifyThread(divES.first());
-            } else if (divES.first().hasClass("f_quote")) {
+            } else if (divES.get(1).select("a").toString().contains("您发表的帖子")) {
                 // user quote your post
-                item = parseNotifyQuoteandReply(divES.first());
+                item = parseNotifyQuoteandReply(divES);
             } else if (divES.first().hasClass("f_reply")) {
                 // user reply your post
-                item = parseNotifyQuoteandReply(divES.first());
+                item = parseNotifyQuoteandReply(divES);
             }
 
             if (item != null) {
@@ -348,56 +354,53 @@ public class HiParser {
         return item;
     }
 
-    public static SimpleListItemBean parseNotifyQuoteandReply(Element root) {
+    public static SimpleListItemBean parseNotifyQuoteandReply(Elements td) {
         SimpleListItemBean item = new SimpleListItemBean();
 
-
-        Elements aES = root.select("a");
-        for (Element a : aES) {
-            String href = a.attr("href");
-            if (href.startsWith(HiUtils.BaseUrl + "space.php")) {
-                String uid = HttpUtils.getMiddleString(a.attr("href"), "uid=", "&");
-                item.setAuthor(a.text());
-                item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
-            } else if (href.startsWith(HiUtils.BaseUrl + "viewthread.php")) {
-                // Thread Name and TID and PID
-                item.setTitle(a.text());
-            } else if (href.startsWith(HiUtils.BaseUrl + "redirect.php?from=notice&goto=findpost")) {
-                // Thread Name and TID and PID
-                item.setTid(HttpUtils.getMiddleString(a.attr("href"), "ptid=", "&"));
-                item.setPid(HttpUtils.getMiddleString(a.attr("href"), "pid=", "&"));
-            }
+        String detailHref = td.get(1).select("a").attr("href");
+        String authorHref = td.get(2).select("a").attr("href");
+        String uid = HttpUtils.getMiddleString(authorHref,"uid-",".");
+        item.setUid(uid);
+        item.setAuthor(td.get(2).text());
+        item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
+        item.setTitle(td.get(1).text());
+        item.setTime(td.get(3).text());
+        item.setDetailUrl(HiUtils.BaseUrl+detailHref);
+        item.setInfo("");
+        if (td.get(1).select("a").attr("style") == "font-weight:800"){
+            item.setNew(true);
         }
+        return item;
+    }
 
-        // time
-        Elements emES = root.select("em");
-        if (emES.size() == 0) {
+    public static SimpleListItemBean parseNotifyQuoteandDetail(String rsp) {
+        Document doc = Jsoup.parse(rsp);
+        if (doc == null) {
             return null;
         }
-        item.setTime(item.getAuthor() + " " + emES.first().text());
 
-        // summary
-        String info = "";
-        Elements summaryES = root.select(".summary");
-        if (summaryES.size() > 0) {
-            Elements ddES = summaryES.select("dd");
-            if (ddES.size() == 2) {
-                info = "<u>您的帖子:</u>" + ddES.get(0).text();
-                info += "<br><u>" + item.getAuthor() + " 说:</u>" + ddES.get(1).text();
-            } else {
-                info = summaryES.first().text();
-            }
+        SimpleListItemBean item = new SimpleListItemBean();
+
+        String tid = "";
+        String pid = "";
+        Elements quoteES = doc.select("div.content div.postmessage");
+        if (quoteES.select("a").get(0).attr("href").contains("redirect.php")) {
+            tid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "ptid=", "&");
+            pid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "pid=", "&");
+        } else if (quoteES.select("a").size() == 2) {
+            tid = HttpUtils.getMiddleString(quoteES.select("a").get(1).attr("href"), "tid=", "&");
+            pid = HttpUtils.getMiddleString(quoteES.select("a").get(1).attr("href"), "pid=", "#");
+        } else {
+            tid = HttpUtils.getMiddleString(quoteES.select("a").get(0).attr("href"), "tid=", "&");
         }
-
-        // new
-        Elements imgES = root.select("img");
-        if (imgES.size() > 0) {
-            if (imgES.first().attr("src").equals("images/default/notice_newpm.gif")) {
-                item.setNew(true);
-            }
-        }
-
+        String author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", "引用并通知您。");
+        String yourInfo = HttpUtils.getMiddleString(quoteES.toString(),"</div>", "[/quote]");
+        String quoteInfo = HttpUtils.getMiddleString(quoteES.toString(), "引用摘要:</strong>", "<br>");
+        String info = "<u>您的帖子:</u>"+yourInfo + "<br><u>" + author + " 说:</u>" + quoteInfo;
         item.setInfo(info);
+        item.setTid(tid);
+        item.setPid(pid);
+
         return item;
     }
 
