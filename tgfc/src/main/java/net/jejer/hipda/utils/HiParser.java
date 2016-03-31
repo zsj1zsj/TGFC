@@ -205,69 +205,61 @@ public class HiParser {
             return null;
         }
 
-        Elements pmlistES = doc.select("table#pmlist tbodys");
+        Elements pmlistES = doc.select("table#pmlist tbody");
         if (pmlistES.size() < 1) {
             return null;
         }
 
         SimpleListBean list = new SimpleListBean();
         Elements liES = pmlistES.first().select("tr");
+
         for (int i = 0; i < liES.size(); ++i) {
-            Element liE = liES.get(i);
-            SimpleListItemBean item = new SimpleListItemBean();
+            if (!liES.get(i).select("td").get(1).select("a").text().contains("您发表的帖子")) {
+                Element liE = liES.get(i);
+                SimpleListItemBean item = new SimpleListItemBean();
 
-            // avatar
-            Elements avatarES = liE.select("a.avatar");
-            if (avatarES.size() > 0) {
-                Elements avatarImgES = avatarES.first().select("img");
-                if (avatarImgES.size() > 0) {
-                    item.setAvatarUrl(avatarImgES.first().attr("src"));
+
+                // author and author uid
+                Element pciteES = liE.select("td").get(2);
+                Elements citeES = pciteES.select("a");
+                if (citeES.size() == 0) {
+                    continue;
                 }
-            }
+                item.setAuthor(citeES.first().text());
+                item.setForum(item.getAuthor());
+                Elements uidAES = citeES.first().select("a");
+                if (uidAES.size() == 0) {
+                    continue;
+                }
+                String uidHref = uidAES.first().attr("href");
+                item.setUid(HttpUtils.getMiddleString(uidHref, "uid-", "."));
 
-            // author and author uid
-            Element pciteES = liE.select("td").get(2);
-            /*
-            if (pciteES.size() == 0) {
-                continue;
-            }
-            */
-            Elements citeES = pciteES.select("a");
-            if (citeES.size() == 0) {
-                continue;
-            }
-            item.setAuthor(citeES.first().text());
-            item.setForum(item.getAuthor());
-            Elements uidAES = citeES.first().select("a");
-            if (uidAES.size() == 0) {
-                continue;
-            }
-            String uid = uidAES.first().attr("href");
-            item.setUid(HttpUtils.getMiddleString(uid, "uid-", "&"));
+                // avatar
+                item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
+                // time
+                item.setTime(liE.select("td").get(3).ownText());
 
-            // time
-            item.setTime(liE.select("td").get(3).ownText());
-
-            // new
-            /*
-            Elements imgES = pciteES.first().select("img");
-            if (imgES.size() > 0) {
-                if (imgES.first().attr("src").equals("images/default/notice_newpm.gif")) {
+                // new
+                Element newES = liE.select("td").get(1);
+                if (newES.attr("style") == "font-weight:800") {
                     item.setNew(true);
                 }
+
+                // info
+                Element summaryES = liE.select("td a").get(0);
+
+                item.setTitle(summaryES.text());
+
+                // detail url
+                String detailHref = liE.select("td a").get(0).attr("href");
+                item.setDetailUrl(HiUtils.BaseUrl+detailHref);
+
+                // pmid
+                String pmid = HttpUtils.getMiddleString(detailHref,"pmid=","&");
+                item.setPmid(pmid);
+
+                list.add(item);
             }
-            */
-            Element newES = liE.select("td").get(1);
-            if (newES.attr("style") == "font-weight:800"){
-                item.setNew(true);
-            }
-
-            // info
-            Element summaryES = liE.select("td a").get(0);
-
-            item.setTitle(summaryES.text());
-
-            list.add(item);
         }
 
         return list;
@@ -385,7 +377,7 @@ public class HiParser {
         String pid = "";
         Elements quoteES = doc.select("div.content div.postmessage");
         if (quoteES.select("a").get(0).attr("href").contains("redirect.php")) {
-            tid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "ptid=", "&");
+            tid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "tid=", "&");
             pid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "pid=", "&");
         } else if (quoteES.select("a").size() == 2) {
             tid = HttpUtils.getMiddleString(quoteES.select("a").get(1).attr("href"), "tid=", "&");
@@ -409,68 +401,41 @@ public class HiParser {
             return null;
         }
 
-        //get my uid and username
-        Elements uidMenuES = doc.select("#umenu cite a.noborder");
-        if (uidMenuES.size() < 1) {
-            return null;
-        }
-        String mySpaceUrl = Utils.nullToText(uidMenuES.first().attr("href"));
-        String myUid = HttpUtils.getMiddleString(mySpaceUrl, "uid=", "&");
-        String myUsername = uidMenuES.first().text();
+        Elements smsDetailES = doc.select("table tbody tr td.postcontent");
 
-        Elements smslistES = doc.select("li.s_clear");
-        if (smslistES.size() < 1) {
-            return null;
-        }
+        Elements postInfoES = smsDetailES.select("p.postinfo").select("a");
+        //get my uid and username
+        String smsTime = HttpUtils.getMiddleString(smsDetailES.select("p.postinfo").text(), "时间:", ",");
+        String myUsername = postInfoES.get(1).text();
+        String myUid = HttpUtils.getMiddleString(postInfoES.get(1).attr("href"),"uid-",".");
+        String author = postInfoES.get(0).text();
+        String authorUid = HttpUtils.getMiddleString(postInfoES.get(0).attr("href"),"uid-",".");
+
+        Elements postmessageES = smsDetailES.select("div.postmessage");
+        String smsTitle = postmessageES.select("a").text();
+        String mySmsDetail = postmessageES.select("div.quote blockquote").text();
+        String smsDetail = postmessageES.text();
 
         SimpleListBean list = new SimpleListBean();
-        for (int i = 0; i < smslistES.size(); ++i) {
-            Element smsE = smslistES.get(i);
-            SimpleListItemBean item = new SimpleListItemBean();
+        SimpleListItemBean item = new SimpleListItemBean();
 
-            // author
-            Elements pciteES = smsE.select("p.cite");
-            if (pciteES.size() == 0) {
-                continue;
-            }
-            Elements citeES = pciteES.first().select("cite");
-            if (citeES.size() == 0) {
-                continue;
-            }
-            item.setAuthor(citeES.first().text());
+        // author
+        item.setAuthor(author);
+        item.setUid(authorUid);
 
-            // avatar
-            Elements avatarES = smsE.select("a.avatar");
-            if (avatarES.size() > 0) {
-                if (item.getAuthor().equals(myUsername)) {
-                    item.setUid(myUid);
-                } else {
-                    String spaceUrl = Utils.nullToText(avatarES.first().attr("href"));
-                    item.setUid(HttpUtils.getMiddleString(spaceUrl, "uid=", "&"));
-                }
-                item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
-            }
+        // avatar
+        item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
 
-            // time
-            item.setTime(pciteES.first().ownText());
 
-            // info
-            Elements summaryES = smsE.select("div.summary");
-            if (summaryES.size() == 0) {
-                continue;
-            }
-            item.setInfo(summaryES.first().html());
+        // time
+        item.setTime(smsTime);
 
-            // new
-            Elements imgES = pciteES.first().select("img");
-            if (imgES.size() > 0) {
-                if (imgES.first().attr("src").equals("images/default/notice_newpm.gif")) {
-                    item.setNew(true);
-                }
-            }
+        // info
+        item.setInfo(smsDetail);
 
-            list.add(item);
-        }
+        // new
+        list.add(item);
+
 
         return list;
     }

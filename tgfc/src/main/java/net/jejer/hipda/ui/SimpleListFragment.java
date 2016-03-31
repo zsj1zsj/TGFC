@@ -361,7 +361,7 @@ public class SimpleListFragment extends BaseFragment
                 listFragment.setHasOptionsMenu(false);
 
             if (mType == SimpleListLoader.TYPE_SMS) {
-                FragmentUtils.showSmsDetail(getFragmentManager(), false, item.getUid(), item.getAuthor());
+                FragmentUtils.showSmsDetail(getFragmentManager(), false, item.getPmid(), item.getAuthor(), item.getDetailUrl());
             } else {
                 FragmentUtils.showThreadNotifyDetail(getFragmentManager(), false, item.getDetailUrl(), item.getTitle(), item.getAvatarUrl(), item.getAuthor(), item.getTime());
             }

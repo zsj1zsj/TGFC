@@ -13,6 +13,7 @@ public class SimpleListItemBean {
     private String mAuthor;
     private String mAvatarUrl = "";
     private String mDetailUrl;
+    private String mPmid;
     private boolean mNew = false;
 
     public String getUid() {
@@ -104,6 +105,15 @@ public class SimpleListItemBean {
 
     public void setDetailUrl(String detailUrl) {
         mDetailUrl = detailUrl;
+    }
+
+
+    public String getPmid() {
+        return mPmid;
+    }
+
+    public void setPmid(String pmid) {
+        mPmid = pmid;
     }
 
 }

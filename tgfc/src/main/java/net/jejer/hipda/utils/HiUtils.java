@@ -23,11 +23,12 @@ public class HiUtils {
     public static final String LastPageUrl = BaseUrl + "redirect.php?goto=lastpost&from=fastpost&tid=";
     public static final String RedirectToPostUrl = BaseUrl + "redirect.php?goto=findpost&pid={pid}&ptid={tid}";
     public static final String GotoPostUrl = BaseUrl + "gotopost.php?pid={pid}";
-    public static final String SMSUrl = BaseUrl + "pm.php?filter=privatepm";
-    public static final String SMSDetailUrl = BaseUrl + "pm.php?daterange=5&uid=";
-    public static final String SMSPreparePostUrl = BaseUrl + "pm.php?daterange=1&uid=";
+    public static final String SMSUrl = BaseUrl + "pm.php?folder=inbox";
+    public static final String SMSDetailUrl = BaseUrl + "pm.php?action=view&folder=inbox&pmid=";
+    public static final String SMSPreparePostUrl = BaseUrl + "pm.php?action=send&do=reply&pmid=";
     public static final String SMSPostByUid = BaseUrl + "pm.php?action=send&pmsubmit=yes&infloat=yes&inajax=1&uid={uid}";
     public static final String SMSPostByUsername = BaseUrl + "pm.php?action=send&pmsubmit=yes&infloat=yes&inajax=1";
+    public static final String SMSPostByPmid = BaseUrl + "pm.php?action=send&pmsubmit=yes&inajax=1";
     public static final String ThreadNotifyUrl = BaseUrl + "pm.php?folder=inbox";
     public static final String CheckSMS = BaseUrl + "pm.php?checknewpm";
     public static final String NewSMS = BaseUrl + "pm.php?folder=inbox";

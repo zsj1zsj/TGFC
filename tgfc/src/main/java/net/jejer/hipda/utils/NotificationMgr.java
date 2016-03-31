@@ -82,7 +82,7 @@ public class NotificationMgr {
     }
 
     public static void fetchNotification(Document doc) {
-        int smsCount = -1;
+        int smsCount = 0;
         int threadCount = -1;
         SimpleListItemBean smsBean = null;
 
@@ -94,12 +94,11 @@ public class NotificationMgr {
                 if (!TextUtils.isEmpty(response)) {
                     doc = Jsoup.parse(response);
                     SimpleListBean listBean = HiParser.parseSMS(doc);
-                    if (listBean != null) {
-                        smsCount = listBean.getCount();
-                        if (smsCount == 1) {
-                            smsBean = listBean.getAll().get(0);
+                        for (SimpleListItemBean smsItem :listBean.getAll()) {
+                            if (smsItem.isNew()){
+                                smsCount += 1;
+                            }
                         }
-                    }
                 }
             } catch (Exception e) {
                 Logger.e(e);
@@ -126,10 +125,12 @@ public class NotificationMgr {
                 mCurrentBean.setUsername(smsBean.getAuthor());
                 mCurrentBean.setUid(smsBean.getUid());
                 mCurrentBean.setContent(smsBean.getTitle());
+                mCurrentBean.setDetailUrl(smsBean.getDetailUrl());
             } else {
                 mCurrentBean.setUsername("");
                 mCurrentBean.setUid("");
                 mCurrentBean.setContent("");
+                mCurrentBean.setDetailUrl("");
             }
         }
     }

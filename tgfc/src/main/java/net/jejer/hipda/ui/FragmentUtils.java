@@ -212,10 +212,11 @@ public class FragmentUtils {
         showFragment(fragmentManager, fragment, directOpen);
     }
 
-    public static void showSmsDetail(FragmentManager fragmentManager, boolean directOpen, String uid, String author) {
+    public static void showSmsDetail(FragmentManager fragmentManager, boolean directOpen, String pmid, String author, String detailUrl) {
         Bundle smsBundle = new Bundle();
         smsBundle.putString(SmsFragment.ARG_AUTHOR, author);
-        smsBundle.putString(SmsFragment.ARG_UID, uid);
+        smsBundle.putString(SmsFragment.ARG_PMID, pmid);
+        smsBundle.putString(SmsFragment.ARG_DETAIL_URL, detailUrl);
         SmsFragment fragment = new SmsFragment();
         fragment.setArguments(smsBundle);
         showFragment(fragmentManager, fragment, directOpen);
@@ -263,7 +264,7 @@ public class FragmentUtils {
         else if (args.getType() == FragmentArgs.TYPE_SMS)
             showSmsList(fragmentManager, args.isDirectOpen());
         else if (args.getType() == FragmentArgs.TYPE_SMS_DETAIL)
-            showSmsDetail(fragmentManager, args.isDirectOpen(), args.getUid(), args.getUsername());
+            showSmsDetail(fragmentManager, args.isDirectOpen(), args.getUid(), args.getUsername(), args.getPostId());
         else if (args.getType() == FragmentArgs.TYPE_THREAD_NOTIFY)
             showThreadNotify(fragmentManager, args.isDirectOpen());
     }

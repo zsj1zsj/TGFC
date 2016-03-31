@@ -10,6 +10,7 @@ public class NotificationBean {
     private String mUsername;
     private String mUid;
     private String mContent;
+    private String mDetailUrl;
 
     public int getSmsCount() {
         return mSmsCount;
@@ -24,6 +25,7 @@ public class NotificationBean {
         this.mUid = "";
         this.mUsername = "";
         this.mContent = "";
+        this.mDetailUrl = "";
     }
 
     public int getThreadCount() {
@@ -64,5 +66,13 @@ public class NotificationBean {
 
     public void setUsername(String username) {
         this.mUsername = username;
+    }
+
+    public String getDetailUrl() {
+        return mDetailUrl;
+    }
+
+    public void setDetailUrl(String detailUrl) {
+        this.mDetailUrl = detailUrl;
     }
 }

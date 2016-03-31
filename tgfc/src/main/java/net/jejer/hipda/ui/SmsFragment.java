@@ -51,9 +51,13 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
 
     public static final String ARG_AUTHOR = "AUTHOR";
     public static final String ARG_UID = "UID";
+    public static final String ARG_DETAIL_URL = "DETAIL_URL";
+    public static final String ARG_PMID = "PMID";
 
     private String mAuthor;
     private String mUid;
+    private String mPmid;
+    private String mDetailUrl;
     private SmsAdapter mSmsAdapter;
     private List<SimpleListItemBean> mSmsBeans = new ArrayList<>();
     private SmsListLoaderCallbacks mLoaderCallbacks;
@@ -74,6 +78,12 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
         }
         if (getArguments().containsKey(ARG_UID)) {
             mUid = getArguments().getString(ARG_UID);
+        }
+        if (getArguments().containsKey(ARG_DETAIL_URL)) {
+            mDetailUrl = getArguments().getString(ARG_DETAIL_URL);
+        }
+        if (getArguments().containsKey(ARG_PMID)) {
+            mPmid = getArguments().getString(ARG_PMID);
         }
 
         mSmsAdapter = new SmsAdapter(this, new AvatarOnClickListener());
@@ -122,7 +132,7 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
             public void onClick(View v) {
                 String replyText = mEtSms.getText().toString();
                 if (replyText.length() > 0) {
-                    new PostSmsAsyncTask(getActivity(), mUid, null, SmsFragment.this, null).execute(replyText);
+                    new PostSmsAsyncTask(getActivity(), mPmid, mAuthor, SmsFragment.this, null).execute(replyText);
                     // Close SoftKeyboard
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mEtSms.getWindowToken(), 0);
@@ -231,6 +241,7 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
         if (status == Constants.STATUS_SUCCESS) {
             mEtSms.setText("");
             //new sms has some delay, so this is a dirty hack
+
             new CountDownTimer(1000, 1000) {
                 public void onTick(long millisUntilFinished) {
                 }
@@ -238,6 +249,7 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
                 public void onFinish() {
                     try {
                         getLoaderManager().restartLoader(0, null, mLoaderCallbacks).forceLoad();
+                        getFragmentManager().popBackStack();
                     } catch (Exception ignored) {
 
                     }
@@ -254,7 +266,7 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
 
         @Override
         public Loader<SimpleListBean> onCreateLoader(int arg0, Bundle arg1) {
-            return new SimpleListLoader(SmsFragment.this.getActivity(), SimpleListLoader.TYPE_SMS_DETAIL, 1, mUid);
+            return new SimpleListLoader(SmsFragment.this.getActivity(), SimpleListLoader.TYPE_SMS_DETAIL, 1, mDetailUrl);
         }
 
         @Override
