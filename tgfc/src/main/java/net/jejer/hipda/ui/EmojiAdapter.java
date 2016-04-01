@@ -33,17 +33,18 @@ public class EmojiAdapter extends BaseAdapter {
 
         switch (tab) {
             case 1:
+
+                mImgArray.append(0, new EmojiBean(R.drawable.default_r1, " :r1: "));
+                mImgArray.append(1, new EmojiBean(R.drawable.default_r2, " :r2: "));
+                mImgArray.append(2, new EmojiBean(R.drawable.default_r3, " :r3: "));
+                mImgArray.append(3, new EmojiBean(R.drawable.default_r4, " :r4: "));
+                mImgArray.append(4, new EmojiBean(R.drawable.default_r5, " :r5: "));
+                mImgArray.append(5, new EmojiBean(R.drawable.default_r6, " :r6: "));
+                mImgArray.append(6, new EmojiBean(R.drawable.default_r7, " :r7: "));
+                mImgArray.append(7, new EmojiBean(R.drawable.default_r8, " :r8: "));
+                mImgArray.append(8, new EmojiBean(R.drawable.default_r9, " :r9: "));
+                mImgArray.append(9, new EmojiBean(R.drawable.default_r10, " :r10: "));
                 /*
-                mImgArray.append(0, new EmojiBean(R.drawable.default_smile, " :) "));
-                mImgArray.append(1, new EmojiBean(R.drawable.default_sweat, " :sweat: "));
-                mImgArray.append(2, new EmojiBean(R.drawable.default_huffy, " :huffy: "));
-                mImgArray.append(3, new EmojiBean(R.drawable.default_cry, " :cry: "));
-                mImgArray.append(4, new EmojiBean(R.drawable.default_titter, " :titter: "));
-                mImgArray.append(5, new EmojiBean(R.drawable.default_handshake, " :handshake: "));
-                mImgArray.append(6, new EmojiBean(R.drawable.default_victory, " :victory: "));
-                mImgArray.append(7, new EmojiBean(R.drawable.default_curse, " :curse: "));
-                mImgArray.append(8, new EmojiBean(R.drawable.default_dizzy, " :dizzy: "));
-                mImgArray.append(9, new EmojiBean(R.drawable.default_shutup, " :shutup: "));
                 mImgArray.append(10, new EmojiBean(R.drawable.default_funk, " :funk: "));
                 mImgArray.append(11, new EmojiBean(R.drawable.default_loveliness, " :loveliness: "));
                 mImgArray.append(12, new EmojiBean(R.drawable.default_sad, " :( "));
@@ -55,7 +56,7 @@ public class EmojiAdapter extends BaseAdapter {
                 mImgArray.append(18, new EmojiBean(R.drawable.default_lol, " :lol: "));
                 mImgArray.append(19, new EmojiBean(R.drawable.default_shy, " :shy: "));
                 mImgArray.append(20, new EmojiBean(R.drawable.default_sleepy, " :sleepy: "));
-                */
+*/
                 break;
             case 2:
                 /*

@@ -107,16 +107,16 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
             result.setText(addtextES.first().text());
         }
 
-        Elements scriptES = doc.select("script");
+        Elements scriptES = doc.select("cite a");
         if (scriptES.size() < 1) {
             return result;
         } else {
-            result.setUid(HttpUtils.getMiddleString(scriptES.first().data(), "discuz_uid = ", ","));
+            result.setUid(HttpUtils.getMiddleString(scriptES.attr("href"), "uid=", ""));
         }
 
         Elements hashES = doc.select("input[name=hash]");
         if (hashES.size() < 1) {
-            return result;
+//            return result;
         } else {
             result.setHash(hashES.first().attr("value"));
         }
@@ -154,8 +154,8 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
             }
         }
 
-        Elements typeidES = doc.select("#typeid > option");
-        for (int i = 0; i < typeidES.size(); i++) {
+        Elements typeidES = doc.select("select[name=typeid] option");
+        for (int i = 1; i < typeidES.size() ; i++) {
             Element typeidEl = typeidES.get(i);
             result.addTypeidValues(typeidEl.val());
             result.addTypeidNames(typeidEl.text());

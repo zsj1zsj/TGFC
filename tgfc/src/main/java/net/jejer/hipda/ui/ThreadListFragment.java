@@ -35,7 +35,9 @@ import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.Iconics;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsImageView;
 
@@ -100,6 +102,7 @@ public class ThreadListFragment extends BaseFragment
 
         mCtx = getActivity();
 
+        Iconics.registerFont(new FontAwesome());
         if (getArguments() != null && getArguments().containsKey(ARG_FID_KEY)) {
             mForumId = getArguments().getInt(ARG_FID_KEY);
         }

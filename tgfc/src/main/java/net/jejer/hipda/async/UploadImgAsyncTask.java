@@ -176,7 +176,7 @@ public class UploadImgAsyncTask extends AsyncTask<Uri, Integer, Void> {
         try {
             barry = ("--" + BOUNDARYSTR + "--\r\n").getBytes("UTF-8");
             SimpleDateFormat formatter = new SimpleDateFormat("yyMMdd_HHmm", Locale.US);
-            String fileName = "Hi_" + formatter.format(new Date()) + "." + Utils.getImageFileSuffix(imageFileInfo.getMime());
+            String fileName = "TG_" + formatter.format(new Date()) + "." + Utils.getImageFileSuffix(imageFileInfo.getMime());
             sendStr = getBoundaryMessage(BOUNDARYSTR, param, imageParamName, fileName, fileType);
             contentLength = sendStr.getBytes("UTF-8").length + baos.size() + 2 * barry.length;
         } catch (UnsupportedEncodingException ignored) {
@@ -245,7 +245,7 @@ public class UploadImgAsyncTask extends AsyncTask<Uri, Integer, Void> {
             }
             Logger.v("uploading image, response : " + urlConnection.getResponseCode() + ", " + urlConnection.getResponseMessage());
             InputStream in = urlConnection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in,"GBK"));
             String inputLine = "";
             while ((inputLine = br.readLine()) != null) {
                 imgId += inputLine;

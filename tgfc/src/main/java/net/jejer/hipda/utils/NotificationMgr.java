@@ -30,6 +30,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * parse and fetch notifications
@@ -94,7 +95,8 @@ public class NotificationMgr {
                 if (!TextUtils.isEmpty(response)) {
                     doc = Jsoup.parse(response);
                     SimpleListBean listBean = HiParser.parseSMS(doc);
-                        for (SimpleListItemBean smsItem :listBean.getAll()) {
+                    List<SimpleListItemBean> itemBean = listBean.getAll();
+                        for (SimpleListItemBean smsItem :itemBean) {
                             if (smsItem.isNew()){
                                 smsCount += 1;
                             }

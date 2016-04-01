@@ -128,14 +128,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
                 android:background="@color/background_grey"
-                android:text="酷酷猴" />
+                android:text="企鹅" />
 
             <Button
                 android:id="@+id/btn3_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
                 android:background="@color/background_grey"
-                android:text="呆呆男" />
+                android:text="悠嘻猴" />
 
         </LinearLayout>
 

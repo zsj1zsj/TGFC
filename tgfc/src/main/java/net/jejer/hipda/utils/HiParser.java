@@ -236,12 +236,13 @@ public class HiParser {
 
                 // avatar
                 item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
+
                 // time
-                item.setTime(liE.select("td").get(3).ownText());
+                item.setTime(liE.select("td em").text());
 
                 // new
                 Element newES = liE.select("td").get(1);
-                if (newES.attr("style") == "font-weight:800") {
+                if (newES.attr("style").equals("font-weight:800")) {
                     item.setNew(true);
                 }
 
@@ -353,13 +354,13 @@ public class HiParser {
         String authorHref = td.get(2).select("a").attr("href");
         String uid = HttpUtils.getMiddleString(authorHref,"uid-",".");
         item.setUid(uid);
-        item.setAuthor(td.get(2).text());
+        item.setForum(td.get(2).select("a").text());
         item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
         item.setTitle(td.get(1).text());
         item.setTime(td.get(3).text());
         item.setDetailUrl(HiUtils.BaseUrl+detailHref);
         item.setInfo("");
-        if (td.get(1).select("a").attr("style") == "font-weight:800"){
+        if (td.get(1).attr("style").contains("font-weight:800")){
             item.setNew(true);
         }
         return item;
@@ -414,7 +415,8 @@ public class HiParser {
         Elements postmessageES = smsDetailES.select("div.postmessage");
         String smsTitle = postmessageES.select("a").text();
         String mySmsDetail = postmessageES.select("div.quote blockquote").text();
-        String smsDetail = postmessageES.text();
+        String authorSmsDetail = HttpUtils.getMiddleString(postmessageES.first().toString(), "</div>", "</div>");
+        String smsDetail = authorSmsDetail;
 
         SimpleListBean list = new SimpleListBean();
         SimpleListItemBean item = new SimpleListItemBean();

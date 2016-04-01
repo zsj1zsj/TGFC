@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.Iconics;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import net.jejer.hipda.R;
@@ -79,6 +80,7 @@ public class PopupImageDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         mCtx = getActivity();
+        Iconics.registerFont(new GoogleMaterial());
         mInflater = (LayoutInflater) mCtx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

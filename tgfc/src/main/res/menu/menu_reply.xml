@@ -4,6 +4,7 @@
 
     <item
         android:id="@+id/action_upload_img"
+        android:visible="false"
         android:title="@string/action_upload_img"
         app:showAsAction="always" />
 
