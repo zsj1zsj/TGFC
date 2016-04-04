@@ -27,7 +27,6 @@ import net.jejer.hipda.ui.MainFrameActivity;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.util.List;
@@ -84,7 +83,7 @@ public class NotificationMgr {
 
     public static void fetchNotification(Document doc) {
         int smsCount = 0;
-        int threadCount = -1;
+        int threadCount = 0;
         SimpleListItemBean smsBean = null;
 
         //check new sms
@@ -95,12 +94,14 @@ public class NotificationMgr {
                 if (!TextUtils.isEmpty(response)) {
                     doc = Jsoup.parse(response);
                     SimpleListBean listBean = HiParser.parseSMS(doc);
-                    List<SimpleListItemBean> itemBean = listBean.getAll();
-                        for (SimpleListItemBean smsItem :itemBean) {
-                            if (smsItem.isNew()){
+                    if (listBean != null) {
+                        List<SimpleListItemBean> itemBean = listBean.getAll();
+                        for (SimpleListItemBean smsItem : itemBean) {
+                            if (smsItem.isNew()) {
                                 smsCount += 1;
                             }
                         }
+                    }
                 }
             } catch (Exception e) {
                 Logger.e(e);
@@ -108,13 +109,22 @@ public class NotificationMgr {
         }
         //check new thread notify
         if (doc != null) {
-            Elements promptThreadES = doc.select("div.promptcontent a#prompt_threads");
-            if (promptThreadES.size() > 0) {
-                String notifyStr = promptThreadES.first().text();
-                String tcount = HttpUtils.getMiddleString(notifyStr, "(", ")");
-                if (!TextUtils.isEmpty(tcount) && TextUtils.isDigitsOnly(tcount)) {
-                    threadCount = Integer.parseInt(tcount);
+            try {
+                String response = OkHttpHelper.getInstance().get(HiUtils.NewSMS);
+                if (!TextUtils.isEmpty(response)) {
+                    doc = Jsoup.parse(response);
+                    SimpleListBean listBean = HiParser.parseNotify(doc);
+                    if (listBean != null) {
+                        List<SimpleListItemBean> itemBean = listBean.getAll();
+                        for (SimpleListItemBean threadItem : itemBean) {
+                            if (threadItem.isNew()) {
+                                threadCount += 1;
+                            }
+                        }
+                    }
                 }
+            } catch (Exception e) {
+                Logger.e(e);
             }
         }
 
@@ -150,7 +160,7 @@ public class NotificationMgr {
                     intent.putExtra(Constants.EXTRA_UID, mCurrentBean.getUid());
                 PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                String title = "HiPDA论坛提醒";
+                String title = "TGFC论坛提醒";
                 String content = getContentText(mCurrentBean);
                 Bitmap icon = null;
 

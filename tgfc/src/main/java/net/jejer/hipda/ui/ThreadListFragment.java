@@ -291,6 +291,8 @@ public class ThreadListFragment extends BaseFragment
                 mThreadListAdapter.setBeans(mThreadBeans);
             }
             showLoginDialog();
+        } else {
+            showLoginDialog();
         }
 
         super.onCreateOptionsMenu(menu, inflater);

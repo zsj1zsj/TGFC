@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -98,7 +97,7 @@ public class OkHttpHelper {
         Request.Builder reqBuilder = new Request.Builder();
         reqBuilder.url(url)
                 .header("User-Agent", HiUtils.getUserAgent())
-                .addHeader("Referer",url)
+//                .addHeader("Referer",url)
                 .post(requestBody);
 
         if (tag != null)
@@ -120,7 +119,7 @@ public class OkHttpHelper {
         Request.Builder builder = new Request.Builder()
                 .url(url)
                 .header("User-Agent", HiUtils.getUserAgent());
-        builder.addHeader("Referer",HiUtils.LoginSubmit);
+        builder.addHeader("Referer",HiUtils.LoginGetFormHash);
 
         Request request = builder.build();
         Response response = client.newCall(request).execute();

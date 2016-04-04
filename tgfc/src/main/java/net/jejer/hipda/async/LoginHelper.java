@@ -114,6 +114,7 @@ public class LoginHelper {
         post_param.put("questionid", HiSettingsHelper.getInstance().getSecQuestion());
         post_param.put("answer", HiSettingsHelper.getInstance().getSecAnswer());
         post_param.put("cookietime", "2592000");
+        post_param.put("loginsubmit", "true");
 
         Logger.v(post_param.toString());
 

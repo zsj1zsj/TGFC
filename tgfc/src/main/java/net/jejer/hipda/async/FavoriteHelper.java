@@ -27,7 +27,8 @@ import java.util.Set;
 public class FavoriteHelper {
 
     public final static String TYPE_FAVORITE = "favorites";
-    public final static String TYPE_ATTENTION = "attention";
+    public final static String TYPE_ATTENTION = "subscriptions";
+
 
     private final static int MAX_CACHE_PAGE = 3;
     private final static String FAV_CACHE_PREFS = "FavCachePrefsFile";

@@ -43,7 +43,7 @@ public class HiUtils {
     public static final String UserInfoUrl = BaseUrl + "space.php?uid=";
     public static final String AvatarBaseUrl = BaseUrl + "customavatars/";
 
-    public static final String LoginSubmit = BaseUrl + "logging.php?action=login&loginsubmit=yes&inajax=1";
+    public static final String LoginSubmit = BaseUrl + "logging.php?action=login&";
     public static final String LoginGetFormHash = BaseUrl + "logging.php?action=login&referer=http%3A//club.tgfcer.com/index.php";
 
     private static String userAgent;

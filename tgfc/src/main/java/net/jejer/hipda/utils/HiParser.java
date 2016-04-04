@@ -50,8 +50,8 @@ public class HiParser {
             return null;
         }
 
-        Elements tableES = doc.select("table.datatable");
-        if (tableES.size() == 0) {
+        Elements mainES = doc.select("div.content div.mainbox");
+        if (mainES.size() == 0) {
             return null;
         }
 
@@ -71,58 +71,50 @@ public class HiParser {
         }
         list.setMaxPage(last_page);
 
-        Elements trES = tableES.first().select("tr");
+        Elements trES = mainES.first().select("table tbody tr");
 
         SimpleListItemBean item = null;
         //first tr is title, skip
-        for (int i = 1; i < trES.size(); ++i) {
+        for (int i = 0; i < trES.size(); ++i) {
             Element trE = trES.get(i);
 
             // odd have title, even have reply text;
-            if (i % 2 == 1) {
-                item = new SimpleListItemBean();
+            item = new SimpleListItemBean();
 
-                // thread
-                Elements thES = trE.select("th");
-                if (thES.size() == 0) {
-                    continue;
-                }
-                Elements linkES = thES.first().select("a");
-                if (linkES.size() != 1) {
-                    continue;
-                }
-                String tid = linkES.first().attr("href");
-                if (!tid.startsWith("redirect.php?goto=")) {
-                    continue;
-                }
-                item.setTid(HttpUtils.getMiddleString(tid, "ptid=", "&"));
-                item.setPid(HttpUtils.getMiddleString(tid, "pid=", "&"));
-                String title = linkES.first().text();
-
-                // time
-                Elements lastpostES = trE.select("td.lastpost");
-                if (lastpostES.size() == 0) {
-                    continue;
-                }
-                String time = lastpostES.first().text();
-
-                item.setTitle(title);
-                item.setTime(time);
-
-                Elements forumES = trE.select("td.forum");
-                if (forumES.size() > 0) {
-                    item.setForum(forumES.first().text());
-                }
-
-            } else {
-                list.add(item);
-
-                Elements thES = trE.select("th");
-                if (thES.size() == 0) {
-                    continue;
-                }
-                item.setInfo(thES.first().text());
+            // thread
+            Elements tdES = trE.select("td");
+            if (tdES.size() == 0) {
+                continue;
             }
+            Elements linkES = tdES.get(0).select("a");
+            if (linkES.size() != 1) {
+                continue;
+            }
+            String tid = linkES.first().attr("href");
+            if (!tid.startsWith("redirect.php?goto=")) {
+                continue;
+            }
+            item.setTid(HttpUtils.getMiddleString(tid, "ptid=", "&"));
+            item.setPid(HttpUtils.getMiddleString(tid, "pid=", "&"));
+            String title = linkES.first().text();
+
+            // time
+            Elements lastpostES = trE.select("td cite a");
+            if (lastpostES.size() == 0) {
+                continue;
+            }
+            String time = lastpostES.first().text();
+            String author= lastpostES.get(1).text();
+
+            item.setTitle(title);
+            item.setTime(author + " " + time);
+
+            Elements forumES = trE.select("td").get(1).select("a");
+            if (forumES.size() > 0) {
+                item.setForum(forumES.first().text());
+            }
+
+            list.add(item);
         }
         return list;
     }
@@ -132,8 +124,8 @@ public class HiParser {
             return null;
         }
 
-        Elements tableES = doc.select("table.datatable");
-        if (tableES.size() == 0) {
+        Elements mainES = doc.select("div.content div.mainbox");
+        if (mainES.size() == 0) {
             return null;
         }
 
@@ -153,44 +145,45 @@ public class HiParser {
         }
         list.setMaxPage(last_page);
 
-        Elements trES = tableES.first().select("tr");
+        Elements trES = mainES.first().select("table tbody tr");
 
         SimpleListItemBean item = null;
         //first tr is title, skip
-        for (int i = 1; i < trES.size(); ++i) {
+        for (int i = 0; i < trES.size(); ++i) {
             Element trE = trES.get(i);
 
             // odd have title, even have reply text;
             item = new SimpleListItemBean();
 
             // thread
-            Elements thES = trE.select("th");
-            if (thES.size() == 0) {
+            Elements tdES = trE.select("td");
+            if (tdES.size() == 0) {
                 continue;
             }
-            Elements linkES = thES.first().select("a");
+            Elements linkES = tdES.get(0).select("a");
             if (linkES.size() != 1) {
                 continue;
             }
             String tid = linkES.first().attr("href");
-            if (!tid.startsWith("viewthread.php?tid=")) {
+            if (!tid.startsWith("thread-")) {
                 continue;
             }
-            tid = HttpUtils.getMiddleString(tid, "viewthread.php?tid=", "&");
+            tid = HttpUtils.getMiddleString(tid, "thread-", "-");
             String title = linkES.first().text();
 
             // time
-            Elements lastpostES = trE.select("td.lastpost");
+            Elements lastpostES = trE.select("td cite a");
             if (lastpostES.size() == 0) {
                 continue;
             }
             String time = lastpostES.first().text();
+            String author= lastpostES.get(1).text();
 
             item.setTid(tid);
             item.setTitle(title);
-            item.setTime(time);
+            item.setTime(author + " " + time);
 
-            Elements forumES = trE.select("td.forum");
+            Elements forumES = trE.select("td").get(1).select("a");
             if (forumES.size() > 0) {
                 item.setForum(forumES.first().text());
             }
@@ -242,7 +235,7 @@ public class HiParser {
 
                 // new
                 Element newES = liE.select("td").get(1);
-                if (newES.attr("style").equals("font-weight:800")) {
+                if (newES.attr("style").contains("font-weight:800")) {
                     item.setNew(true);
                 }
 
@@ -278,7 +271,7 @@ public class HiParser {
 
         SimpleListBean list = new SimpleListBean();
         Elements liES = feedES.first().select("tr");
-        for (int i = 0; i < liES.size() && i < 15; ++i) {
+        for (int i = 0; i < liES.size(); ++i) {
             Element liE = liES.get(i);
             Elements divES = liE.select("td");
             if (divES.size() == 0) {
@@ -291,6 +284,9 @@ public class HiParser {
             } else if (divES.get(1).select("a").toString().contains("您发表的帖子")) {
                 // user quote your post
                 item = parseNotifyQuoteandReply(divES);
+                if (divES.get(1).attr("style").contains("font-weight:800")){
+                    item.setNew(true);
+                }
             } else if (divES.first().hasClass("f_reply")) {
                 // user reply your post
                 item = parseNotifyQuoteandReply(divES);
@@ -376,20 +372,38 @@ public class HiParser {
 
         String tid = "";
         String pid = "";
+        String info = "";
+        String author = "";
+        String type = doc.select("div.content div.mainbox h1").text();
         Elements quoteES = doc.select("div.content div.postmessage");
-        if (quoteES.select("a").get(0).attr("href").contains("redirect.php")) {
-            tid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "tid=", "&");
-            pid = HttpUtils.getMiddleString(quoteES.select("a").get(2).attr("href"), "pid=", "&");
-        } else if (quoteES.select("a").size() == 2) {
-            tid = HttpUtils.getMiddleString(quoteES.select("a").get(1).attr("href"), "tid=", "&");
-            pid = HttpUtils.getMiddleString(quoteES.select("a").get(1).attr("href"), "pid=", "#");
-        } else {
-            tid = HttpUtils.getMiddleString(quoteES.select("a").get(0).attr("href"), "tid=", "&");
+        Elements aES = quoteES.select("a");
+        if (type.contains("您发表的帖子被引用")) {
+            if (aES.get(0).attr("href").contains("redirect.php")) {
+                tid = HttpUtils.getMiddleString(aES.get(2).attr("href"), "tid=", "&");
+                pid = HttpUtils.getMiddleString(aES.get(2).attr("href"), "pid=", "&");
+            } else if (aES.size() == 2) {
+                tid = HttpUtils.getMiddleString(aES.get(1).attr("href"), "tid=", "&");
+                pid = HttpUtils.getMiddleString(aES.get(1).attr("href"), "pid=", "#");
+            } else {
+                tid = HttpUtils.getMiddleString(aES.get(0).attr("href"), "tid=", "&");
+            }
+            author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", " 引用并通知您。");
+            String yourInfo = HttpUtils.getMiddleString(quoteES.toString(), "</div>", "[/quote]");
+            String quoteInfo = HttpUtils.getMiddleString(quoteES.toString(), "引用摘要:</strong>", "<br>");
+            info = "<u>您的帖子:</u>" + yourInfo + "<br><u>" + author + " 说:</u>" + quoteInfo;
+        } else if(type.contains("您发表的帖子被回复")) {
+             author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", " 回复并通知您。");
+             info = quoteES.toString();
+        } else if (type.contains("您发表的帖子被评分")) {
+            author = HttpUtils.getMiddleString(aES.toString(), "以下您所发表的帖子被 ", " 评分。");
+            for (Element a : aES) {
+                if (a.attr("href").contains("viewthread.php")) {
+                    tid = HttpUtils.getMiddleString(a.attr("href"), "tid=", "&");
+                    pid = HttpUtils.getMiddleString(a.attr("href"), "pid=", "&");
+                }
+            }
+            info = quoteES.toString();
         }
-        String author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", "引用并通知您。");
-        String yourInfo = HttpUtils.getMiddleString(quoteES.toString(),"</div>", "[/quote]");
-        String quoteInfo = HttpUtils.getMiddleString(quoteES.toString(), "引用摘要:</strong>", "<br>");
-        String info = "<u>您的帖子:</u>"+yourInfo + "<br><u>" + author + " 说:</u>" + quoteInfo;
         item.setInfo(info);
         item.setTid(tid);
         item.setPid(pid);
@@ -615,30 +629,34 @@ public class HiParser {
         }
         list.setMaxPage(last_page);
 
-        Elements trES = doc.select("table.datatable tbody tr");
+        Elements trES = doc.select("div.content div.mainbox form table tbody tr");
         for (int i = 0; i < trES.size(); ++i) {
             Element trE = trES.get(i);
             SimpleListItemBean item = new SimpleListItemBean();
 
-            Elements subjectES = trE.select("th");
-            if (subjectES.size() == 0) {
+            Elements tdES = trE.select("td");
+            if (tdES.size() < 2 ){
                 continue;
             }
-            item.setTitle(subjectES.first().text());
+            Element subjectE = trE.select("td").get(1);
 
-            Elements subjectAES = subjectES.first().select("a");
+            item.setTitle(subjectE.text());
+
+            Elements subjectAES = subjectE.select("a");
             if (subjectAES.size() == 0) {
                 continue;
             }
             String href = subjectAES.first().attr("href");
-            item.setTid(HttpUtils.getMiddleString(href, "tid=", "&"));
+            item.setTid(HttpUtils.getMiddleString(href, "thread-", "-"));
 
-            Elements timeES = trE.select("td.lastpost");
+            Elements timeES = trE.select("cite a");
             if (timeES.size() > 0) {
-                item.setTime(timeES.first().text().trim());
+                String time = timeES.get(0).text();
+                String author = timeES.get(1).text();
+                item.setTime(author + "" + time);
             }
 
-            Elements forumES = trE.select("td.forum");
+            Elements forumES = trE.select("td").get(2).select("a");
             if (forumES.size() > 0) {
                 item.setForum(forumES.first().text().trim());
             }

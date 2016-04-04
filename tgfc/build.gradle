@@ -8,6 +8,8 @@ android {
         applicationId "net.jejer.tgfc.ng"
         minSdkVersion 14
         targetSdkVersion 23
+        versionCode 9
+        versionName "0.9"
     }
 
     buildTypes {
@@ -19,7 +21,7 @@ android {
             applicationVariants.all { variant ->
                 variant.outputs.each { output ->
                     output.outputFile = new File(output.outputFile.parent,
-                            output.outputFile.name.replace("-release", "-ng-release")
+                            output.outputFile.name.replace("-release", "-ng-release-" + versionName)
                     )
                 }
             }
