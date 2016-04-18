@@ -240,7 +240,6 @@ public class HiParserThreadDetail {
                 Elements poststatusES = postmessageE.select("i");
                 if (poststatusES.size() > 0) {
                     poststatus = poststatusES.first().text();
-                    detail.setPostStatus(poststatus);
                     //remove then it will not show in content
                     poststatusES.first().remove();
                 }
@@ -249,11 +248,24 @@ public class HiParserThreadDetail {
             Elements postplatformES = postmessageE.select("font[color=DarkRed] font[size=2]");
             if (postplatformES.size() > 0) {
                 String postplatform = postplatformES.first().text();
-                detail.setPostStatus(poststatus+" "+postplatform);
+                if (poststatus == "") {
+                    poststatus = postplatform;
+                } else {
+                    poststatus = postplatform + "\r\n" + poststatus;
+                }
                 //remove then it will not show in content
                 postplatformES.first().remove();
             }
 
+            //post rating
+            Elements postratingES = postE.select("table tbody tr td.postcontent div.defaultpost fieldset ul li");
+            if (postratingES.size() > 0) {
+                for (Element postratingE : postratingES) {
+                    poststatus = poststatus + "\r\n" + postratingE.text();
+                }
+            }
+
+            detail.setPostStatus(poststatus);
 
             // Nodes including Elements(have tag) and text without tag
                 TextStyleHolder textStyles = new TextStyleHolder();

@@ -483,16 +483,16 @@ public class HiParser {
         }
         list.setMaxPage(last_page);
 
-        Elements tbodyES = doc.select("tbody");
+        Elements tbodyES = doc.select("div.threadlist tbody");
         for (int i = 0; i < tbodyES.size(); ++i) {
             Element tbodyE = tbodyES.get(i);
             SimpleListItemBean item = new SimpleListItemBean();
 
-            Elements subjectES = tbodyE.select("tr th.subject");
-            if (subjectES.size() == 0) {
+            Elements subjectES = tbodyE.select("tr th");
+            if (subjectES.first().text().contains("没有找到匹配结果")) {
                 continue;
             }
-            item.setTitle(subjectES.first().text());
+            item.setTitle(subjectES.select("a").first().text());
 
             Elements subjectAES = subjectES.first().select("a");
             if (subjectAES.size() == 0) {
@@ -509,7 +509,7 @@ public class HiParser {
 
             String spaceUrl = authorAES.first().attr("href");
             if (!TextUtils.isEmpty(spaceUrl)) {
-                String uid = HttpUtils.getMiddleString(spaceUrl, "uid=", "&");
+                String uid = HttpUtils.getMiddleString(spaceUrl, "space-uid-", ".");
                 item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
             }
 
@@ -553,54 +553,45 @@ public class HiParser {
         }
         list.setMaxPage(last_page);
 
-        Elements tbodyES = doc.select("table.datatable tr");
+        Elements tbodyES = doc.select("div.threadlist tbody");
         for (int i = 0; i < tbodyES.size(); ++i) {
-            Element trowE = tbodyES.get(i);
+            Element tbodyE = tbodyES.get(i);
             SimpleListItemBean item = new SimpleListItemBean();
 
-            Elements subjectES = trowE.select("div.sp_title a");
+            Elements subjectES = tbodyE.select("tr th");
             if (subjectES.size() == 0) {
                 continue;
             }
-            item.setTitle(subjectES.first().text());
-            //gotopost.php?pid=12345
-            String postUrl = Utils.nullToText(subjectES.first().attr("href"));
-            item.setPid(HttpUtils.getMiddleString(postUrl, "pid=", "&"));
-            if (TextUtils.isEmpty(item.getPid())) {
+            item.setTitle(subjectES.select("a").first().text());
+
+            Elements subjectAES = subjectES.first().select("a");
+            if (subjectAES.size() == 0) {
                 continue;
             }
+            String href = subjectAES.first().attr("href");
+            item.setTid(HttpUtils.getMiddleString(href, "tid=", "&"));
 
-            Elements contentES = trowE.select("div.sp_content");
-            if (contentES.size() > 0) {
-                item.setInfo(contentES.text());
-            }
-
-//            <div class="sp_theard">
-//            <span class="sp_w200">版块: <a href="forumdisplay.php?fid=2">Discovery</a></span>
-//            <span>作者: <a href="space.php?uid=189027">tsonglin</a></span>
-//            <span>查看: 1988</span>
-//            <span>回复: 56</span>
-//            <span class="sp_w200">最后发表: 2015-4-4 21:58</span>
-//            </div>
-            Elements postInfoES = trowE.select("div.sp_theard span");
-            if (postInfoES.size() != 5) {
+            Elements authorAES = tbodyE.select("tr td.author cite a");
+            if (authorAES.size() == 0) {
                 continue;
             }
-            Elements authorES = postInfoES.get(1).select("a");
-            if (authorES.size() > 0) {
-                item.setAuthor(authorES.first().text());
-                String spaceUrl = authorES.first().attr("href");
-                if (!TextUtils.isEmpty(spaceUrl)) {
-                    String uid = HttpUtils.getMiddleString(spaceUrl, "uid=", "&");
-                    item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
-                }
+            item.setAuthor(authorAES.first().text());
+
+            String spaceUrl = authorAES.first().attr("href");
+            if (!TextUtils.isEmpty(spaceUrl)) {
+                String uid = HttpUtils.getMiddleString(spaceUrl, "space-uid-", ".");
+                item.setAvatarUrl(HiUtils.getAvatarUrlByUid(uid));
             }
 
-            item.setTime(item.getAuthor() + " " + HttpUtils.getMiddleString(postInfoES.get(4).text(), ":", "&"));
+            Elements timeES = tbodyE.select("tr td.author em");
+            if (timeES.size() > 0) {
+                item.setTime(item.getAuthor() + "  " + timeES.first().text());
+            }
 
-            Elements forumES = postInfoES.get(0).select("a");
-            if (forumES.size() > 0)
+            Elements forumES = tbodyE.select("tr td.forum");
+            if (forumES.size() > 0) {
                 item.setForum(forumES.first().text());
+            }
 
             list.add(item);
         }
@@ -675,9 +666,9 @@ public class HiParser {
 
         UserInfoBean info = new UserInfoBean();
 
-        Elements usernameES = doc.select("div#profilecontent div.itemtitle h1");
+        Elements usernameES = doc.select("div.specialthread h1");
         if (usernameES.size() > 0) {
-            info.setUsername(Utils.nullToText(usernameES.first().text()).trim());
+            info.setUsername(Utils.nullToText(usernameES.first().text()).trim().replace(" 的个人资料",""));
         }
 
         Elements onlineImgES = doc.select("div#profilecontent div.itemtitle img");
@@ -685,24 +676,25 @@ public class HiParser {
             info.setOnline(Utils.nullToText(onlineImgES.first().attr("src")).contains("online"));
         }
 
-        Elements uidES = doc.select("div#profilecontent div.itemtitle ul li");
+        Elements uidTdES = doc.select("td.postcontent table thead");
+        Elements uidES = uidTdES.get(0).select("tr td a");
         if (uidES.size() > 0) {
-            info.setUid(HttpUtils.getMiddleString(uidES.first().text(), "(UID:", ")").trim());
+            info.setUid(HttpUtils.getMiddleString(uidES.get(0).attr("href"), "eccredit.php?uid=", ""));
         }
 
-        Elements avatarES = doc.select("div.side div.profile_side div.avatar img");
+        Elements avatarES = doc.select("div.avatar img");
         if (avatarES.size() != 0) {
-            info.setAvatarUrl(avatarES.first().attr("src"));
+            info.setAvatarUrl(HiUtils.BaseUrl + avatarES.first().attr("src"));
         }
 
         StringBuilder sb = new StringBuilder();
 
-        Elements titleES = doc.select("h3.blocktitle");
+        Elements titleES = doc.select("td.postcontent table tbody");
         int i = 0;
         for (Element titleEl : titleES) {
-            sb.append(titleEl.text()).append("\n\n");
+//            sb.append(titleEl.text()).append("\n\n");
             if (i == 0) {
-                Elements detailES = doc.select("div.main div.s_clear ul.commonlist li");
+                Elements detailES = doc.select("td.postcontent table tbody tr");
                 for (Element detail : detailES) {
                     sb.append(detail.text()).append('\n');
                 }

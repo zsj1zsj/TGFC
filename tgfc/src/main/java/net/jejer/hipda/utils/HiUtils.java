@@ -1,5 +1,6 @@
 package net.jejer.hipda.utils;
 
+import android.os.Build;
 import android.text.TextUtils;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -10,7 +11,7 @@ import net.jejer.hipda.bean.HiSettingsHelper;
 import net.jejer.hipda.ui.HiApplication;
 
 public class HiUtils {
-    public static final String UserAgentPrefix = "net.jejer.hipda ";
+    public static final String UserAgentPrefix = "TGFC-NG (" + Build.MODEL + ")";
     public static final String BaseUrl = "http://club.tgfcer.com/";
     public static final String SecCodeVerifyUrl = BaseUrl + "seccode.php?update=";
     public static final String ThreadListUrl = BaseUrl + "forumdisplay.php?fid=";
@@ -40,7 +41,7 @@ public class HiUtils {
     public static final String FavoritesUrl = BaseUrl + "my.php?item={item}&type=thread";
     public static final String FavoriteAddUrl = BaseUrl + "my.php?item={item}&action=add&inajax=1&ajaxtarget=favorite_msg&tid={tid}";
     public static final String FavoriteRemoveUrl = BaseUrl + "my.php?item={item}&action=remove&inajax=1&ajaxtarget=favorite_msg&tid={tid}";
-    public static final String UserInfoUrl = BaseUrl + "space.php?uid=";
+    public static final String UserInfoUrl = BaseUrl + "space.php?action=viewpro&uid=";
     public static final String AvatarBaseUrl = BaseUrl + "customavatars/";
 
     public static final String LoginSubmit = BaseUrl + "logging.php?action=login&";
@@ -56,15 +57,20 @@ public class HiUtils {
     public static int FID_DIGIT = 10;
     public static int FID_BS = 90;
 
-    public final static String[] FORUMS = {"灌水与情感",  "完全数码讨论区", "游戏业界综合讨论区", "摄影区", "汽车版", "二手交易区"};
-    public final static int[] FORUM_IDS = {25, FID_DIGIT, 33, 41, 59, FID_BS};
+    public final static String[] FORUMS = {"灌水与情感",  "完全数码讨论区", "Apple 专区", "摄影区", "汽车版", "二手交易区", "游戏业界综合讨论区", "主机游戏讨论区", "手机和掌机游戏讨论区", "体育运动专区", "影视专区"};
+    public final static int[] FORUM_IDS = {25, FID_DIGIT, 85, 41, 59, FID_BS, 33, 29, 5, 6, 12};
     public final static IIcon[] FORUM_ICONS = {
             FontAwesome.Icon.faw_anchor,
             FontAwesome.Icon.faw_mobile_phone,
-            FontAwesome.Icon.faw_gamepad,
+            FontAwesome.Icon.faw_apple,
             FontAwesome.Icon.faw_camera,
             FontAwesome.Icon.faw_car,
-            FontAwesome.Icon.faw_shopping_cart
+            FontAwesome.Icon.faw_shopping_cart,
+            FontAwesome.Icon.faw_star,
+            FontAwesome.Icon.faw_gamepad,
+            FontAwesome.Icon.faw_credit_card,
+            FontAwesome.Icon.faw_soccer_ball_o,
+            FontAwesome.Icon.faw_video_camera
     };
 
     public static int getForumID(int idx) {

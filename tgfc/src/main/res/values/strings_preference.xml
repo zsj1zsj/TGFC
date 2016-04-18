@@ -135,18 +135,28 @@
     <string-array name="pref_title_forum_names">
         <item>灌水与情感</item>
         <item>完全数码讨论区</item>
-        <item>游戏业界综合讨论区</item>
+        <item>Apple 专区</item>
         <item>摄影区</item>
         <item>汽车版</item>
         <item>二手交易区</item>
+        <item>游戏业界综合讨论区</item>
+        <item>主机游戏讨论区</item>
+        <item>手机和掌机游戏讨论区</item>
+        <item>体育运动专区</item>
+        <item>影视专区</item>
     </string-array>
     <string-array name="pref_title_forum_values">
         <item>25</item>
         <item>10</item>
-        <item>33</item>
+        <item>85</item>
         <item>41</item>
         <item>59</item>
         <item>90</item>
+        <item>33</item>
+        <item>29</item>
+        <item>5</item>
+        <item>6</item>
+        <item>12</item>
     </string-array>
     <string-array name="default_forum_values">
         <item>25</item>

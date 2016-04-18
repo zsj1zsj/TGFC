@@ -203,7 +203,8 @@ public class SimpleListFragment extends BaseFragment
                 break;
             case SimpleListLoader.TYPE_SEARCH:
                 setActionBarTitle(R.string.title_drawer_search);
-                mPrefixSearchFullText = getActivity().getResources().getString(R.string.prefix_search_fulltext);
+//                mPrefixSearchFullText = getActivity().getResources().getString(R.string.prefix_search_fulltext);
+                mPrefixSearchFullText = "";
 
                 inflater.inflate(R.menu.menu_search, menu);
                 searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));

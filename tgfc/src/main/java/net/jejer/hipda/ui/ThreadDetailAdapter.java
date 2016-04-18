@@ -128,6 +128,7 @@ public class ThreadDetailAdapter extends HiAdapter<DetailBean> {
                         cnt = cnt.substring("<br>".length());
                     }
                 }
+                cnt = cnt.replace("[]","");
                 if (!"<br>".equals(cnt)) {
                     tv.setText(cnt);
                     tv.setFocusable(false);

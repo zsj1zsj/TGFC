@@ -265,7 +265,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
         final GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                showGotoPageDialog();
+                showRatingDialog();
                 return true;
             }
         };
@@ -851,6 +851,109 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mGoToPage = progress + 1; //start from 0
                 dialog.setTitle("第 " + String.valueOf(mGoToPage) + " / " + (mMaxPage) + " 页");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar arg0) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar arg0) {
+            }
+        });
+
+        btnFirstPage.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCurrentPage = 1;
+                showOrLoadPage();
+                dialog.dismiss();
+            }
+        });
+
+        btnLastPage.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCurrentPage = mMaxPage;
+                mFloorOfPage = LAST_FLOOR;
+                showOrLoadPage();
+                dialog.dismiss();
+            }
+        });
+
+        btnNextPage.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mCurrentPage < mMaxPage) {
+                    mCurrentPage++;
+                    showOrLoadPage();
+                }
+                dialog.dismiss();
+            }
+        });
+
+        btnPreviousPage.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mCurrentPage > 1) {
+                    mCurrentPage--;
+                    showOrLoadPage();
+                }
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    private void showRatingDialog() {
+        if (mAuthorOnly) {
+            Toast.makeText(getActivity(), "请先退出只看楼主模式", Toast.LENGTH_LONG).show();
+            return;
+        }
+        mGoToPage = mCurrentPage;
+        final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View viewlayout = inflater.inflate(R.layout.dialog_goto_page, null);
+        final ImageButton btnFirstPage = (ImageButton) viewlayout.findViewById(R.id.btn_fisrt_page);
+        final ImageButton btnLastPage = (ImageButton) viewlayout.findViewById(R.id.btn_last_page);
+        final ImageButton btnNextPage = (ImageButton) viewlayout.findViewById(R.id.btn_next_page);
+        final ImageButton btnPreviousPage = (ImageButton) viewlayout.findViewById(R.id.btn_previous_page);
+        final SeekBar sbGotoPage = (SeekBar) viewlayout.findViewById(R.id.sb_page);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        final AlertDialog dialog;
+
+        btnFirstPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_fast_backward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
+        btnLastPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_fast_forward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
+        btnNextPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_step_forward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
+        btnPreviousPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_step_backward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
+
+        builder.setTitle("第 " + String.valueOf(mGoToPage) + " / " + (mMaxPage) + " 页");
+        builder.setView(viewlayout);
+
+        builder.setPositiveButton(getResources().getString(android.R.string.ok),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mCurrentPage = mGoToPage;
+                        showOrLoadPage();
+                    }
+                });
+        builder.setNegativeButton(getResources().getString(android.R.string.cancel),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+        dialog = builder.create();
+
+        // Fuck Android SeekBar, always start from 0
+        sbGotoPage.setMax(12);
+        sbGotoPage.setProgress(6);
+        sbGotoPage.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mGoToPage = progress - 6; //start from 0
+                dialog.setTitle("激骚度 " + String.valueOf(mGoToPage));
             }
 
             @Override

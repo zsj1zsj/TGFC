@@ -197,7 +197,7 @@ public class UpdateHelper {
 
                 Utils.clearCache(context);
             }
-            if (newer("2.0.10", currentVersion)) {
+            if (newer("0.8", currentVersion)) {
                 if (TextUtils.isEmpty(HiSettingsHelper.getInstance().getStringValue(HiSettingsHelper.PERF_NOTI_SILENT_BEGIN, ""))) {
                     HiSettingsHelper.getInstance()
                             .setStringValue(HiSettingsHelper.PERF_NOTI_SILENT_BEGIN, NotificationMgr.DEFAUL_SLIENT_BEGIN);
@@ -208,7 +208,7 @@ public class UpdateHelper {
                 }
             }
 
-            if (newer(installedVersion, "2.2.01")) {
+            if (newer(installedVersion, "0.8")) {
                 String blacklist = HiSettingsHelper.getInstance().getStringValue(HiSettingsHelper.PERF_BLANKLIST_USERNAMES, "");
                 if (blacklist.length() > 0 && blacklist.contains(" ") && !blacklist.contains("\n")) {
                     String[] usernames = blacklist.split(" ");
