@@ -7,6 +7,7 @@
     <string name="not_login">"您还没有登录"</string>
     <string name="default_tail_text">"TGFC·NG"</string>
     <string name="default_tail_url">"http://club.tgfcer.com/thread-7194126-1-1.html"</string>
+    <string name="rating_success">"感谢您的参与"</string>
 
     <item name="avatar_tag_uid" type="id" />
     <item name="avatar_tag_username" type="id" />

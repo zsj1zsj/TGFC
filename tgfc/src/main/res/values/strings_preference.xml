@@ -10,6 +10,85 @@
     <string name="pref_title_login_question">安全提问</string>
     <string name="pref_title_login_answer">回答</string>
 
+    <string-array name="rating_list_titles">
+        <item>激骚度</item>
+        <item>--------</item>
+        <item>-6</item>
+        <item>-5</item>
+        <item>-4</item>
+        <item>-3</item>
+        <item>-2</item>
+        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string-array name="rating_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+    </string-array>
+    <string-array name="rating_reason_list_titles">
+        <item>自定义</item>
+        <item>--------</item>
+        <item>版务处理</item>
+        <item>人身攻击</item>
+        <item>骂人</item>
+        <item>违规内容</item>
+        <item>重复发帖</item>
+        <item>广告/SPAM</item>
+        <item>--------</item>
+        <item>我很赞同</item>
+        <item>感谢分享</item>
+        <item>精品文章</item>
+        <item>原创内容</item>
+        <item>疯狂厨房</item>
+        <item>--------</item>
+        <item>太骚了</item>
+        <item>拍拍肩膀</item>
+        <item>泪流满面</item>
+        <item>好闪！</item>
+        <item>威武！</item>
+        <item>IDC</item>
+    </string-array>
+    <string-array name="rating_reason_list_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+    </string-array>
+
     <string-array name="pref_login_question_list_titles">
         <item>无安全提问</item>
         <item>母亲的名字</item>

@@ -46,6 +46,7 @@ public class HiUtils {
 
     public static final String LoginSubmit = BaseUrl + "logging.php?action=login&";
     public static final String LoginGetFormHash = BaseUrl + "logging.php?action=login&referer=http%3A//club.tgfcer.com/index.php";
+    public static final String RatingSubmit = BaseUrl + "misc.php?action=rate&inajax=1";
 
     private static String userAgent;
 

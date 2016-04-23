@@ -34,10 +34,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,6 +71,7 @@ import net.jejer.hipda.glide.GlideImageManager;
 import net.jejer.hipda.glide.GlideImageView;
 import net.jejer.hipda.glide.ImageReadyInfo;
 import net.jejer.hipda.glide.ThreadImageDecoder;
+import net.jejer.hipda.okhttp.OkHttpHelper;
 import net.jejer.hipda.utils.ColorUtils;
 import net.jejer.hipda.utils.Constants;
 import net.jejer.hipda.utils.HiUtils;
@@ -76,7 +80,9 @@ import net.jejer.hipda.utils.Logger;
 import net.jejer.hipda.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
@@ -265,7 +271,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
         final GestureDetector.SimpleOnGestureListener listener = new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                showRatingDialog();
+                showGotoPageDialog();
                 return true;
             }
         };
@@ -907,35 +913,85 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
     }
 
 
-    private void showRatingDialog() {
+    public void showRatingDialog(String rTitle, String rTid, String rPid) {
         if (mAuthorOnly) {
             Toast.makeText(getActivity(), "请先退出只看楼主模式", Toast.LENGTH_LONG).show();
             return;
         }
-        mGoToPage = mCurrentPage;
+
         final LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View viewlayout = inflater.inflate(R.layout.dialog_goto_page, null);
-        final ImageButton btnFirstPage = (ImageButton) viewlayout.findViewById(R.id.btn_fisrt_page);
-        final ImageButton btnLastPage = (ImageButton) viewlayout.findViewById(R.id.btn_last_page);
-        final ImageButton btnNextPage = (ImageButton) viewlayout.findViewById(R.id.btn_next_page);
-        final ImageButton btnPreviousPage = (ImageButton) viewlayout.findViewById(R.id.btn_previous_page);
-        final SeekBar sbGotoPage = (SeekBar) viewlayout.findViewById(R.id.sb_page);
+        final View viewlayout = inflater.inflate(R.layout.dialog_rating, null);
+        final Spinner spReason = (Spinner) viewlayout.findViewById(R.id.sp_reason);
+        final Spinner spRating = (Spinner) viewlayout.findViewById(R.id.sp_rating);
+        final EditText etReason = (EditText) viewlayout.findViewById(R.id.et_reason);
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         final AlertDialog dialog;
 
-        btnFirstPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_fast_backward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
-        btnLastPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_fast_forward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
-        btnNextPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_step_forward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
-        btnPreviousPage.setImageDrawable(new IconicsDrawable(getActivity(), FontAwesome.Icon.faw_step_backward).sizeDp(24).color(ColorUtils.getColorAccent(getActivity())));
+        final KeyValueArrayAdapter rating_adapter = new KeyValueArrayAdapter(mCtx, R.layout.spinner_row);
+        rating_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_list_values));
+        rating_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_list_titles));
+        spRating.setAdapter(rating_adapter);
+        spRating.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
 
-        builder.setTitle("第 " + String.valueOf(mGoToPage) + " / " + (mMaxPage) + " 页");
+        final KeyValueArrayAdapter reason_adapter = new KeyValueArrayAdapter(mCtx, R.layout.spinner_row);
+        reason_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_reason_list_values));
+        reason_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_reason_list_titles));
+        spReason.setAdapter(reason_adapter);
+        spReason.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
+
+        spReason.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position !=0 && position !=1 && position !=8 && position !=14) {
+                    etReason.setText(reason_adapter.getEntry(position));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        builder.setTitle("为 " + rTitle  + " 评分");
         builder.setView(viewlayout);
+
+        final int score = spRating.getSelectedItemPosition()-8;
+        final Map<String, String> post_param = new HashMap<>();
+        post_param.put("formhash", "");
+//        post_param.put("referer", HiUtils.BaseUrl + "index.php");
+        post_param.put("ratesubmit", "yes");
+        post_param.put("score4",String.valueOf(score));
+        post_param.put("selectreason", reason_adapter.getEntry(spReason.getSelectedItemPosition()));
+        post_param.put("reason", reason_adapter.getEntry(spReason.getSelectedItemPosition()));
+        post_param.put("tid", String.valueOf(rTid));
+        post_param.put("pid", String.valueOf(rPid));
+        post_param.put("page", String.valueOf(mCurrentPage));
+
+        Logger.v(post_param.toString());
 
         builder.setPositiveButton(getResources().getString(android.R.string.ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mCurrentPage = mGoToPage;
-                        showOrLoadPage();
+                        if (score >= -6) {
+                            try {
+                                String rspStr;
+                                rspStr = OkHttpHelper.getInstance().post(HiUtils.LoginSubmit, post_param);
+                                Logger.v(rspStr);
+
+                                // response is in XML format
+                                if (rspStr.contains(mCtx.getString(R.string.rating_success))) {
+                                    Logger.v("Rating success!");
+                                    Toast.makeText(mCtx, "评分成功,感谢您的参与.", Toast.LENGTH_SHORT).show();
+                                } else if (rspStr.contains(mCtx.getString(R.string.login_fail))) {
+                                    Logger.e("Rating FAIL");
+                                    Toast.makeText(mCtx, "评分失败,", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e) {
+                                Toast.makeText(mCtx, "评分失败,", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
                 });
         builder.setNegativeButton(getResources().getString(android.R.string.cancel),
@@ -945,66 +1001,6 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
                     }
                 });
         dialog = builder.create();
-
-        // Fuck Android SeekBar, always start from 0
-        sbGotoPage.setMax(12);
-        sbGotoPage.setProgress(6);
-        sbGotoPage.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mGoToPage = progress - 6; //start from 0
-                dialog.setTitle("激骚度 " + String.valueOf(mGoToPage));
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar arg0) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar arg0) {
-            }
-        });
-
-        btnFirstPage.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCurrentPage = 1;
-                showOrLoadPage();
-                dialog.dismiss();
-            }
-        });
-
-        btnLastPage.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCurrentPage = mMaxPage;
-                mFloorOfPage = LAST_FLOOR;
-                showOrLoadPage();
-                dialog.dismiss();
-            }
-        });
-
-        btnNextPage.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCurrentPage < mMaxPage) {
-                    mCurrentPage++;
-                    showOrLoadPage();
-                }
-                dialog.dismiss();
-            }
-        });
-
-        btnPreviousPage.setOnClickListener(new Button.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCurrentPage > 1) {
-                    mCurrentPage--;
-                    showOrLoadPage();
-                }
-                dialog.dismiss();
-            }
-        });
 
         dialog.show();
     }
