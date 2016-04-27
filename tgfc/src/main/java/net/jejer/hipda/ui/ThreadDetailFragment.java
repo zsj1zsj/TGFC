@@ -37,7 +37,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -62,6 +61,7 @@ import net.jejer.hipda.bean.DetailBean;
 import net.jejer.hipda.bean.DetailListBean;
 import net.jejer.hipda.bean.HiSettingsHelper;
 import net.jejer.hipda.bean.PostBean;
+import net.jejer.hipda.bean.PrePostInfoBean;
 import net.jejer.hipda.cache.ImageContainer;
 import net.jejer.hipda.cache.ThreadDetailCache;
 import net.jejer.hipda.glide.GifTransformation;
@@ -71,7 +71,6 @@ import net.jejer.hipda.glide.GlideImageManager;
 import net.jejer.hipda.glide.GlideImageView;
 import net.jejer.hipda.glide.ImageReadyInfo;
 import net.jejer.hipda.glide.ThreadImageDecoder;
-import net.jejer.hipda.okhttp.OkHttpHelper;
 import net.jejer.hipda.utils.ColorUtils;
 import net.jejer.hipda.utils.Constants;
 import net.jejer.hipda.utils.HiUtils;
@@ -80,9 +79,7 @@ import net.jejer.hipda.utils.Logger;
 import net.jejer.hipda.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
@@ -125,6 +122,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
     private boolean mAuthorOnly = false;
     private ThreadDetailCache mCache = new ThreadDetailCache();
     public static final String LOADER_PAGE_KEY = "LOADER_PAGE_KEY";
+    private PrePostInfoBean mInfo;
 
     private HiProgressDialog postProgressDialog;
     private FloatingActionMenu mFam;
@@ -913,7 +911,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
     }
 
 
-    public void showRatingDialog(String rTitle, String rTid, String rPid) {
+    public void showRatingDialog(String rTitle, final String rFloor, final String rTid, final String rPid) {
         if (mAuthorOnly) {
             Toast.makeText(getActivity(), "请先退出只看楼主模式", Toast.LENGTH_LONG).show();
             return;
@@ -928,14 +926,14 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
         final AlertDialog dialog;
 
         final KeyValueArrayAdapter rating_adapter = new KeyValueArrayAdapter(mCtx, R.layout.spinner_row);
-        rating_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_list_values));
-        rating_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_list_titles));
+        rating_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_list));
+        rating_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_list));
         spRating.setAdapter(rating_adapter);
         spRating.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
 
         final KeyValueArrayAdapter reason_adapter = new KeyValueArrayAdapter(mCtx, R.layout.spinner_row);
-        reason_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_reason_list_values));
-        reason_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_reason_list_titles));
+        reason_adapter.setEntryValues(mCtx.getResources().getStringArray(R.array.rating_reason_list));
+        reason_adapter.setEntries(mCtx.getResources().getStringArray(R.array.rating_reason_list));
         spReason.setAdapter(reason_adapter);
         spReason.setGravity(android.view.Gravity.CENTER_HORIZONTAL);
 
@@ -944,7 +942,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position !=0 && position !=1 && position !=8 && position !=14) {
-                    etReason.setText(reason_adapter.getEntry(position));
+                    etReason.setText(reason_adapter.getEntryValue(position));
                 }
             }
 
@@ -954,43 +952,26 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
             }
         });
 
+
         builder.setTitle("为 " + rTitle  + " 评分");
         builder.setView(viewlayout);
-
-        final int score = spRating.getSelectedItemPosition()-8;
-        final Map<String, String> post_param = new HashMap<>();
-        post_param.put("formhash", "");
-//        post_param.put("referer", HiUtils.BaseUrl + "index.php");
-        post_param.put("ratesubmit", "yes");
-        post_param.put("score4",String.valueOf(score));
-        post_param.put("selectreason", reason_adapter.getEntry(spReason.getSelectedItemPosition()));
-        post_param.put("reason", reason_adapter.getEntry(spReason.getSelectedItemPosition()));
-        post_param.put("tid", String.valueOf(rTid));
-        post_param.put("pid", String.valueOf(rPid));
-        post_param.put("page", String.valueOf(mCurrentPage));
-
-        Logger.v(post_param.toString());
 
         builder.setPositiveButton(getResources().getString(android.R.string.ok),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        if (score >= -6) {
-                            try {
-                                String rspStr;
-                                rspStr = OkHttpHelper.getInstance().post(HiUtils.LoginSubmit, post_param);
-                                Logger.v(rspStr);
+                        String score = rating_adapter.getEntryValue(spRating.getSelectedItemPosition());
 
-                                // response is in XML format
-                                if (rspStr.contains(mCtx.getString(R.string.rating_success))) {
-                                    Logger.v("Rating success!");
-                                    Toast.makeText(mCtx, "评分成功,感谢您的参与.", Toast.LENGTH_SHORT).show();
-                                } else if (rspStr.contains(mCtx.getString(R.string.login_fail))) {
-                                    Logger.e("Rating FAIL");
-                                    Toast.makeText(mCtx, "评分失败,", Toast.LENGTH_SHORT).show();
-                                }
-                            } catch (Exception e) {
-                                Toast.makeText(mCtx, "评分失败,", Toast.LENGTH_SHORT).show();
-                            }
+                        PostBean postBean = new PostBean();
+                        postBean.setPid(String.valueOf(rPid));
+                        postBean.setTid(String.valueOf(rTid));
+                        postBean.setFloor(String.valueOf(rFloor));
+                        postBean.setPage(String.valueOf(mCurrentPage));
+                        postBean.setScore(score);
+                        postBean.setReason(etReason.getText().toString());
+
+                        if (!score.equals("激骚度") || !score.equals("--------")) {
+                            new PostAsyncTask(getActivity(), PostAsyncTask.MODE_RATING_POST, null, ThreadDetailFragment.this).execute(postBean);
+
                         }
                     }
                 });

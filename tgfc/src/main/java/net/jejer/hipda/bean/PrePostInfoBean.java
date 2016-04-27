@@ -17,6 +17,7 @@ public class PrePostInfoBean {
     private String noticeauthor;
     private String noticeauthormsg;
     private String noticetrimstr;
+    private String ratingamount;
     private List<String> attaches = new ArrayList<>();
     private List<String> typeidValues = new ArrayList<>();
     private List<String> typeidNames = new ArrayList<>();
@@ -39,12 +40,16 @@ public class PrePostInfoBean {
         this.attaches = attaches;
     }
 
-    public String getFormhash() {
-        return formhash;
-    }
+    public String getFormhash() { return formhash; }
 
     public void setFormhash(String formhash) {
         this.formhash = formhash;
+    }
+
+    public String getRatingAmount() { return ratingamount; }
+
+    public void setRatingAmount(String ratingamount) {
+        this.ratingamount = ratingamount;
     }
 
     public String getHash() {

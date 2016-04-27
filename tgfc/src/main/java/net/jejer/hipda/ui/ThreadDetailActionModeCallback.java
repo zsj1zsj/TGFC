@@ -105,7 +105,7 @@ public class ThreadDetailActionModeCallback implements ActionMode.Callback {
                 return true;
             case R.id.action_rating:
                 if (mFragment.getActivity() != null) {
-                    mFragment.showRatingDialog(mDetailBean.getFloor() + "# " + mDetailBean.getAuthor(), mTid, mDetailBean.getPostId());
+                    mFragment.showRatingDialog(mDetailBean.getFloor() + "# " + mDetailBean.getAuthor(), mDetailBean.getFloor(), mTid, mDetailBean.getPostId());
                 }
                 mode.finish();
                 return true;

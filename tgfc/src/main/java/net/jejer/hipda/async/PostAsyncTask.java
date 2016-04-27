@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 
+import net.jejer.hipda.R;
 import net.jejer.hipda.bean.HiSettingsHelper;
 import net.jejer.hipda.bean.PostBean;
 import net.jejer.hipda.bean.PrePostInfoBean;
@@ -29,6 +30,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
     public static final int MODE_NEW_THREAD = 3;
     public static final int MODE_QUICK_REPLY = 4;
     public static final int MODE_EDIT_POST = 5;
+    public static final int MODE_RATING_POST = 6;
 
     private int mMode;
     private String mResult;
@@ -67,6 +69,10 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         String subject = postBean.getSubject();
         String typeid = postBean.getTypeid();
 
+        String page = postBean.getPage();
+        String score = postBean.getScore();
+        String reason = postBean.getReason();
+
         int count = 0;
         while (mInfo == null && count < 3) {
             count++;
@@ -75,6 +81,15 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
 
         if (!TextUtils.isEmpty(floor) && TextUtils.isDigitsOnly(floor))
             mFloor = floor;
+
+        if (mMode == MODE_RATING_POST)
+        {
+
+            String url = HiUtils.RatingSubmit + "&ratesubmit=yes";
+            // do send
+            doRatingPost(url, tid, pid, page, score, reason);
+            return null;
+        }
 
         if (mMode != MODE_EDIT_POST) {
             String tail_text = HiSettingsHelper.getInstance().getTailText();
@@ -212,6 +227,58 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         } catch (Exception e) {
             Logger.e(e);
             mResult = "发表失败 : " + OkHttpHelper.getErrorMessage(e);
+            mStatus = Constants.STATUS_FAIL;
+        }
+
+    }
+
+    private void doRatingPost(String url, String tid, String pid, String page, String score, String reason) {
+
+        String formhash = mInfo != null ? mInfo.getFormhash() : null;
+        int ratingAmount = Integer.parseInt(mInfo != null ? mInfo.getRatingAmount() : null) - Math.abs(Integer.parseInt(score));
+
+        if (TextUtils.isEmpty(formhash)) {
+            mResult = "评分失败，无法获取必要信息 ！";
+            mStatus = Constants.STATUS_FAIL;
+            return;
+        }
+
+        Map<String, String> post_param = new HashMap<>();
+        post_param.put("formhash", formhash);
+        post_param.put("score4", score);
+        post_param.put("selectreason", reason);
+        post_param.put("reason", reason);
+        post_param.put("tid", tid);
+        post_param.put("pid", pid);
+        post_param.put("page", page);
+
+        Logger.v(post_param.toString());
+
+        String rsp_str;
+        try {
+            rsp_str = OkHttpHelper.getInstance().post(url, post_param);
+
+            //when success, okhttp will follow 302 redirect get the page content
+            if (!TextUtils.isEmpty(rsp_str)) {
+                if (rsp_str.contains(mCtx.getString(R.string.rating_success))) {
+                    Logger.v("Rating success!");
+                    mTid = tid;
+                    mResult = "评分成功,您今日还能剩 " + ratingAmount + " 评分。";
+                    mStatus = Constants.STATUS_SUCCESS;
+                } else if (rsp_str.contains(mCtx.getString(R.string.rating_fail))) {
+                    Logger.e("Rating FAIL");
+                    Logger.e(rsp_str);
+                    mResult = "对不起，您最近 24 小时评分数超过限制! ";
+                    mStatus = Constants.STATUS_FAIL;
+                }
+            } else {
+                mResult = "评分失败，无返回结果! ";
+                mStatus = Constants.STATUS_FAIL;
+            }
+
+        } catch (Exception e) {
+            Logger.e(e);
+            mResult = "评分失败 : " + OkHttpHelper.getErrorMessage(e);
             mStatus = Constants.STATUS_FAIL;
         }
 

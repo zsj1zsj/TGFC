@@ -58,6 +58,9 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
                 //fid is not really needed, just put a value here
                 mUrl = HiUtils.EditUrl + "&fid=" + fid + "&tid=" + tid + "&pid=" + pid + "&page=1";
                 break;
+            case PostAsyncTask.MODE_RATING_POST:
+                mUrl = HiUtils.PreRating + "&tid=" + tid + "&pid=" + pid + "&page=1";
+                break;
         }
 
         String rsp_str = "";
@@ -98,6 +101,13 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
             return result;
         } else {
             result.setFormhash(formhashES.first().attr("value"));
+        }
+
+        Elements ratingAmES = doc.select("em.tips");
+        if (formhashES.size() < 1) {
+            return result;
+        } else {
+            result.setRatingAmount(ratingAmES.first().text().replace("( 今日还能评分 ", "").replace(" )", ""));
         }
 
         Elements addtextES = doc.select("textarea");

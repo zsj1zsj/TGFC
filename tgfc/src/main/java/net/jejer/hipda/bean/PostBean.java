@@ -10,6 +10,9 @@ public class PostBean {
     private String pid;
     private String fid;
     private String floor;
+    private String page;
+    private String score;
+    private String reason;
     private String subject;
     private String content;
     private String typeid;
@@ -44,6 +47,30 @@ public class PostBean {
 
     public void setFloor(String floor) {
         this.floor = floor;
+    }
+
+    public String getPage() {
+        return page;
+    }
+
+    public void setPage(String page) {
+        this.page = page;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getSubject() {
