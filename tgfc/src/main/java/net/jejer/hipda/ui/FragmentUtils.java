@@ -87,6 +87,19 @@ public class FragmentUtils {
                     return args;
                 }
             }
+        } else if (url.startsWith(HiUtils.BaseUrl + "thread-")) {
+                String tid = HttpUtils.getMiddleString(url, "thread-", "-");
+                if (HiUtils.isValidId(tid)) {
+                    FragmentArgs args = new FragmentArgs();
+                    args.setType(FragmentArgs.TYPE_THREAD);
+                    args.setTid(tid);
+
+                    String page = HttpUtils.getMiddleString(url, "thread-" + tid + "-", "-");
+                    if (!TextUtils.isEmpty(page) && TextUtils.isDigitsOnly(page))
+                        args.setPage(Integer.parseInt(page));
+
+                    return args;
+                }
         } else if (url.startsWith(HiUtils.BaseUrl + "redirect.php")) {
             String gotoStr = HttpUtils.getMiddleString(url, "goto=", "&");
             if (!TextUtils.isEmpty(gotoStr)) {

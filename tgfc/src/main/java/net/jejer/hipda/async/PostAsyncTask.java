@@ -2,6 +2,7 @@ package net.jejer.hipda.async;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.text.TextUtils;
 
 import net.jejer.hipda.R;
@@ -92,6 +93,8 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         }
 
         if (mMode != MODE_EDIT_POST) {
+            String platform_text = "[color=DarkRed][size=2] Posted by TGFC·NG, Platform: " + Build.MANUFACTURER + " " + Build.MODEL + "[/size][/color]\r\n";
+            replyText = platform_text + replyText;
             String tail_text = HiSettingsHelper.getInstance().getTailText();
             if (!tail_text.isEmpty() && HiSettingsHelper.getInstance().isAddTail()) {
                 String tail_url = HiSettingsHelper.getInstance().getTailUrl();

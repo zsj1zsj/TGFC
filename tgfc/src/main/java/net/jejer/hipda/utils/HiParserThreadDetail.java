@@ -261,7 +261,11 @@ public class HiParserThreadDetail {
             Elements postratingES = postE.select("table tbody tr td.postcontent div.defaultpost fieldset ul li");
             if (postratingES.size() > 0) {
                 for (Element postratingE : postratingES) {
-                    poststatus = poststatus + "\r\n" + postratingE.text();
+                    if (poststatus == "") {
+                        poststatus = postratingE.text();
+                    } else {
+                        poststatus = poststatus + "\r\n" + postratingE.text();
+                    }
                 }
             }
 

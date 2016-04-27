@@ -35,11 +35,12 @@
 
                 <data android:scheme="http" />
                 <data android:host="club.tgfcer.com" />
-                <data android:pathPrefix="/forum/forumdisplay.php" />
-                <data android:pathPrefix="/forum/viewthread.php" />
-                <data android:pathPrefix="/forum/gotopost.php" />
-                <data android:pathPrefix="/forum/redirect.php" />
-                <data android:pathPrefix="/forum/space.php" />
+                <data android:pathPrefix="/forumdisplay.php" />
+                <data android:pathPrefix="/viewthread.php" />
+                <data android:pathPrefix="/gotopost.php" />
+                <data android:pathPrefix="/redirect.php" />
+                <data android:pathPrefix="/space.php" />
+                <data android:pathPrefix="/thread-" />
             </intent-filter>
         </activity-alias>
 
