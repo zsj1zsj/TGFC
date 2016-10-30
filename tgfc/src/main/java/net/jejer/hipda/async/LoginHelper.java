@@ -46,12 +46,12 @@ public class LoginHelper {
         int status = Constants.STATUS_FAIL_ABORT;
 
         if (HiSettingsHelper.getInstance().isLoginInfoValid()) {
-//            String formhash = getFormhash();
-//            if (!TextUtils.isEmpty(formhash)) {
-//                status = doLogin(formhash);
-            String formhash = "";
-            status = doLogin(formhash);
-//            }
+            String formhash = getFormhash();
+            if (!TextUtils.isEmpty(formhash)) {
+                status = doLogin(formhash);
+//            String formhash = "";
+//            status = doLogin(formhash);
+            }
         } else {
             mErrorMsg = "登录信息不完整";
         }

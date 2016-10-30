@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -284,7 +285,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
         menu.clear();
         inflater.inflate(R.menu.menu_reply, menu);
 
-//        menu.findItem(R.id.action_upload_img).setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_comment_image).actionBar().color(Color.WHITE));
+        menu.findItem(R.id.action_upload_img).setIcon(new IconicsDrawable(getActivity(), GoogleMaterial.Icon.gmd_comment_image).actionBar().color(Color.WHITE));
 
         setActionBarTitle(R.string.action_reply);
         setActionBarDisplayHomeAsUpEnabled(true);

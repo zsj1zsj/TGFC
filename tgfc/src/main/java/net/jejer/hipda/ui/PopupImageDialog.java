@@ -191,7 +191,7 @@ public class PopupImageDialog extends DialogFragment {
                                 return;
                             }
 
-                            String filename = Utils.getImageFileName("Hi_IMG", imageReadyInfo.getMime());
+                            String filename = Utils.getImageFileName("TGFC_IMG", imageReadyInfo.getMime());
                             File destFile = new File(Environment.getExternalStoragePublicDirectory(
                                     Environment.DIRECTORY_DOWNLOADS), filename);
                             Utils.copy(new File(imageReadyInfo.getPath()), destFile);

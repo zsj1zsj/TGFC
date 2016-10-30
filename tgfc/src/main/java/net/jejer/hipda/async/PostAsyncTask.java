@@ -93,7 +93,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         }
 
         if (mMode != MODE_EDIT_POST) {
-            String platform_text = "[color=DarkRed][size=2] Posted by TGFC·NG, Platform: " + Build.MANUFACTURER + " " + Build.MODEL + "[/size][/color]\r\n";
+            String platform_text = "[color=DarkRed][size=2] Posted by: " + Build.MANUFACTURER + " " + Build.MODEL + "[/size][/color]\r\n";
             replyText = platform_text + replyText;
             String tail_text = HiSettingsHelper.getInstance().getTailText();
             if (!tail_text.isEmpty() && HiSettingsHelper.getInstance().isAddTail()) {
