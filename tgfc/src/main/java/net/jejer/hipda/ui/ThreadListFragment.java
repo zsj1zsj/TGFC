@@ -291,8 +291,6 @@ public class ThreadListFragment extends BaseFragment
                 mThreadListAdapter.setBeans(mThreadBeans);
             }
             showLoginDialog();
-        } else {
-            showLoginDialog();
         }
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -507,7 +505,7 @@ public class ThreadListFragment extends BaseFragment
                     mInloading = true;
                     getLoaderManager().restartLoader(0, null, mCallbacks).forceLoad();
                     if (HiSettingsHelper.getInstance().getMaxPostsInPage() < HiUtils.MAX_THREADS_IN_PAGE)
-                        Toast.makeText(mCtx, "置顶贴较多，请在网页版论坛 个人中心 \n将 论坛个性化设定 - 每页主题 设为 默认", Toast.LENGTH_LONG).show();
+//                        Toast.makeText(mCtx, "置顶贴较多，请在网页版论坛 个人中心 \n将 论坛个性化设定 - 每页主题 设为 默认", Toast.LENGTH_LONG).show();
                     return;
                 }
 

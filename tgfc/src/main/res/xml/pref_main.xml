@@ -14,7 +14,7 @@
         android:title="@string/pref_title_about" />
 
     <Preference
-        android:enabled="false"
+        android:enabled="true"
         android:key="PERF_LAST_UPDATE_CHECK"
         android:persistent="false"
         android:selectable="true"

@@ -46,12 +46,12 @@ public class LoginHelper {
         int status = Constants.STATUS_FAIL_ABORT;
 
         if (HiSettingsHelper.getInstance().isLoginInfoValid()) {
-            String formhash = getFormhash();
-            if (!TextUtils.isEmpty(formhash)) {
-                status = doLogin(formhash);
-//            String formhash = "";
-//            status = doLogin(formhash);
-            }
+//            String formhash = getFormhash();
+//            if (!TextUtils.isEmpty(formhash)) {
+//                status = doLogin(formhash);
+            String formhash = "";
+            status = doLogin(formhash);
+//            }
         } else {
             mErrorMsg = "登录信息不完整";
         }
@@ -110,7 +110,7 @@ public class LoginHelper {
         post_param.put("loginfield", "username");
         post_param.put("username", HiSettingsHelper.getInstance().getUsername());
         post_param.put("password", HiSettingsHelper.getInstance().getPassword());
-        post_param.put("seccodeverify",HiSettingsHelper.getInstance().getSecCodeVerify());
+//        post_param.put("seccodeverify",HiSettingsHelper.getInstance().getSecCodeVerify());
         post_param.put("questionid", HiSettingsHelper.getInstance().getSecQuestion());
         post_param.put("answer", HiSettingsHelper.getInstance().getSecAnswer());
         post_param.put("cookietime", "2592000");
