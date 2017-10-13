@@ -19,24 +19,29 @@ public class HiParserThreadList {
     private static long HOLD_FETCH_NOTIFY = 0;
 
     public static ThreadListBean parse(Context context, Handler handler, Document doc) {
+
         // Update UI
         Message msgStartParse = Message.obtain();
         msgStartParse.what = ThreadListFragment.STAGE_PARSE;
         handler.sendMessage(msgStartParse);
 
         // Async check notify
-        new parseNotifyRunnable(context, doc).run();
+//        new parseNotifyRunnable(context, doc).run();
+        if (doc.toString().contains("新短消息")){
+            NotificationMgr.fetchNotification(doc);
+            NotificationMgr.showNotification(context);
+        };
         HiSettingsHelper.updateMobileNetworkStatus(context);
 
         ThreadListBean threads = new ThreadListBean();
 
         //parse uid and re-set username if necessary
         if (TextUtils.isEmpty(HiSettingsHelper.getInstance().getUid())) {
-            Elements spaceES = doc.select("#umenu cite a");
+            Elements spaceES = doc.select("a#my");
             if (spaceES.size() == 1) {
                 String spaceUrl = spaceES.first().attr("href");
                 if (!TextUtils.isEmpty(spaceUrl)) {
-                    String uid = HttpUtils.getMiddleString(spaceUrl, "space.php?uid=", "&");
+                    String uid = HttpUtils.getMiddleString(spaceUrl, "uid=", "");
                     String username = Utils.nullToText(spaceES.first().text()).trim();
                     if (!TextUtils.isEmpty(uid)
                             && TextUtils.isDigitsOnly(uid)
@@ -207,9 +212,9 @@ public class HiParserThreadList {
 
         @Override
         public void run() {
-            if (System.currentTimeMillis() > HOLD_FETCH_NOTIFY + 10 * 1000) {
-                NotificationMgr.fetchNotification(mDoc);
-                NotificationMgr.showNotification(mCtx);
+            if (System.currentTimeMillis() > HOLD_FETCH_NOTIFY + 600 * 1000) {
+//                NotificationMgr.fetchNotification(mDoc);
+//                NotificationMgr.showNotification(mCtx);
             }
         }
     }

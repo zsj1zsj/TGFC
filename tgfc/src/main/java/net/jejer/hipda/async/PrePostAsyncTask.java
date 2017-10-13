@@ -40,7 +40,7 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
         String pid = postBean.getPid();
         String fid = postBean.getFid();
 
-        mUrl = HiUtils.ReplyUrl + tid;
+        mUrl = HiUtils.ReplyUrl + tid + "&fid=" + fid;
         switch (mMode) {
             case PostAsyncTask.MODE_REPLY_THREAD:
             case PostAsyncTask.MODE_QUICK_REPLY:

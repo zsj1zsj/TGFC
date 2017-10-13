@@ -11,7 +11,7 @@ import net.jejer.hipda.ui.HiApplication;
 
 public class HiUtils {
     public static final String UserAgentPrefix = "TGFC NG";
-    public static final String BaseUrl = "http://club.tgfcer.net/";
+    public static final String BaseUrl = "http://club.tgfcer.com/";
     public static final String SecCodeVerifyUrl = BaseUrl + "seccode.php?update=";
     public static final String ThreadListUrl = BaseUrl + "forumdisplay.php?fid=";
     public static final String DetailListUrl = BaseUrl + "viewthread.php?tid=";
@@ -32,7 +32,7 @@ public class HiUtils {
     public static final String ThreadNotifyUrl = BaseUrl + "pm.php?folder=inbox";
     public static final String CheckSMS = BaseUrl + "pm.php?checknewpm";
     public static final String NewSMS = BaseUrl + "pm.php?folder=inbox";
-    public static final String ClearSMS = BaseUrl + "pm.php?action=del&uid={uid}&filter=privatepm";
+    public static final String ClearSMS = BaseUrl + "pm.php?action=delete&folder=inbox&pmid=";
     public static final String UploadImgUrl = BaseUrl + "misc.php?action=swfupload&operation=upload&simple=1&type=image";
     public static final String SearchTitle = BaseUrl + "search.php?srchtype=title&searchsubmit=true&st=on&srchuname=&srchfilter=all&srchfrom=0&before=&orderby=lastpost&ascdesc=desc&srchfid%5B0%5D=all&srchtxt=";
     public static final String SearchFullText = BaseUrl + "search.php?srchtype=fulltext&searchsubmit=true&st=on&srchuname=&srchfilter=all&srchfrom=0&before=&orderby=lastpost&ascdesc=desc&srchfid%5B0%5D=all&srchtxt=";

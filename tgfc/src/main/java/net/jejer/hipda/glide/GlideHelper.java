@@ -104,7 +104,7 @@ public class GlideHelper {
 
             AVATAR_CACHE_DIR = Glide.getPhotoCacheDir(context, "avatar");
 
-            DEFAULT_USER_ICON = new IconicsDrawable(HiApplication.getAppContext(), GoogleMaterial.Icon.gmd_account_box).color(Color.LTGRAY).sizeDp(64);
+            DEFAULT_USER_ICON = new IconicsDrawable(HiApplication.getAppContext(), GoogleMaterial.Icon.gmd_account_box).color(Color.LTGRAY).sizeDp(48);
             DEFAULT_AVATAR_FILE = new File(AVATAR_CACHE_DIR, "default.png");
             if (!DEFAULT_AVATAR_FILE.exists()) {
                 try {

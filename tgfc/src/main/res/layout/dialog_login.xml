@@ -36,7 +36,7 @@
             android:layout_margin="8dp"
             android:inputType="text"
             android:maxLength="4"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <ImageView
             android:layout_width="fill_parent"
@@ -44,7 +44,7 @@
             android:id="@+id/seccode_image"
             android:layout_gravity="bottom"
             android:layout_margin="8dp"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
         <Spinner
             android:id="@+id/login_question"

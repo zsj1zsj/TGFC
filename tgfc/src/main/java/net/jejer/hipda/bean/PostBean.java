@@ -1,5 +1,9 @@
 package net.jejer.hipda.bean;
 
+import android.net.Uri;
+
+import java.util.Map;
+
 /**
  * Used for post arguments
  * Created by GreenSkinMonster on 2015-03-14.
@@ -16,6 +20,7 @@ public class PostBean {
     private String subject;
     private String content;
     private String typeid;
+    private Map<Uri, String> images;
 
     public String getTid() {
         return tid;
@@ -47,6 +52,12 @@ public class PostBean {
 
     public void setFloor(String floor) {
         this.floor = floor;
+    }
+
+    public Map<Uri, String> getImages() { return images; }
+
+    public void setImages(Map<Uri, String> images) {
+        this.images = images;
     }
 
     public String getPage() {

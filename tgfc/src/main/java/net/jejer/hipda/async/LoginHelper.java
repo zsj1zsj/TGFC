@@ -110,7 +110,7 @@ public class LoginHelper {
         post_param.put("loginfield", "username");
         post_param.put("username", HiSettingsHelper.getInstance().getUsername());
         post_param.put("password", HiSettingsHelper.getInstance().getPassword());
-//        post_param.put("seccodeverify",HiSettingsHelper.getInstance().getSecCodeVerify());
+        post_param.put("seccodeverify",HiSettingsHelper.getInstance().getSecCodeVerify());
         post_param.put("questionid", HiSettingsHelper.getInstance().getSecQuestion());
         post_param.put("answer", HiSettingsHelper.getInstance().getSecAnswer());
         post_param.put("cookietime", "2592000");
@@ -153,8 +153,8 @@ public class LoginHelper {
 
     public static boolean checkLoggedin(Context context, String mRsp) {
         boolean loggedIn = !mRsp.contains(context.getString(R.string.not_login));
-        if (!loggedIn)
-            logout();
+//        if (!loggedIn)
+            //logout();
         return loggedIn;
     }
 

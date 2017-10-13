@@ -190,15 +190,15 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
 
     private void showClearSmsDialog() {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(getActivity());
-        popDialog.setTitle("清空短消息？");
-        popDialog.setMessage(Html.fromHtml("确认清空所有与用户 <b>" + mAuthor + "</b> 的短消息？<br><br><font color=red>注意：此操作不可恢复。</font>"));
-        popDialog.setPositiveButton("清空",
+        popDialog.setTitle("删除短消息？");
+        popDialog.setMessage(Html.fromHtml("确认删除与用户 <b>" + mAuthor + "</b> 的短消息？<br><br><font color=red>注意：此操作不可恢复。</font>"));
+        popDialog.setPositiveButton("删除",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final HiProgressDialog progress = HiProgressDialog.show(getActivity(), "正在处理...");
 
-                        String url = HiUtils.ClearSMS.replace("{uid}", mUid);
+                        String url = HiUtils.ClearSMS + mPmid;
 
                         OkHttpHelper.getInstance().asyncGet(url, new OkHttpHelper.ResultCallback() {
                             @Override
@@ -266,7 +266,7 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
 
         @Override
         public Loader<SimpleListBean> onCreateLoader(int arg0, Bundle arg1) {
-            return new SimpleListLoader(SmsFragment.this.getActivity(), SimpleListLoader.TYPE_SMS_DETAIL, 1, mDetailUrl);
+            return new SimpleListLoader(SmsFragment.this.getActivity(), SimpleListLoader.TYPE_SMS_DETAIL, 1, mPmid);
         }
 
         @Override
@@ -300,7 +300,9 @@ public class SmsFragment extends BaseFragment implements PostSmsAsyncTask.SmsPos
             String uid = (String) arg0.getTag(R.id.avatar_tag_uid);
             String username = (String) arg0.getTag(R.id.avatar_tag_username);
 
-            FragmentUtils.showSpace(getFragmentManager(), false, uid, username);
+            if(uid != "0") {
+                FragmentUtils.showSpace(getFragmentManager(), false, uid, username);
+            }
 
         }
     }

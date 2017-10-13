@@ -207,7 +207,7 @@ public class HiParser {
         Elements liES = pmlistES.first().select("tr");
 
         for (int i = 0; i < liES.size(); ++i) {
-            if (!liES.get(i).select("td").get(1).select("a").text().contains("您发表的帖子")) {
+//            if (!liES.get(i).select("td").get(1).select("a").text().contains("您发表的帖子")) {
                 Element liE = liES.get(i);
                 SimpleListItemBean item = new SimpleListItemBean();
 
@@ -253,7 +253,7 @@ public class HiParser {
                 item.setPmid(pmid);
 
                 list.add(item);
-            }
+//            }
         }
 
         return list;
@@ -416,38 +416,88 @@ public class HiParser {
             return null;
         }
 
-        Elements smsDetailES = doc.select("table tbody tr td.postcontent");
+        String tid = "";
+        String pid = "";
+        String author = "";
+        String authorUid = "";
+        String smsTime = "";
+        String smsDetail = "";
+        Elements mainBox = doc.select("div.mainbox");
+        if (mainBox.size() > 0) {
+            String type = doc.select("div.content div.mainbox h1").text();
+            Elements quoteES = doc.select("div.content div.postmessage");
+            Elements aES = quoteES.select("a");
+            if (type.contains("您发表的帖子被引用")) {
+                if (aES.get(0).attr("href").contains("redirect.php")) {
+                    tid = HttpUtils.getMiddleString(aES.get(2).attr("href"), "tid=", "&");
+                    pid = HttpUtils.getMiddleString(aES.get(2).attr("href"), "pid=", "&");
+                } else if (aES.size() == 2) {
+                    tid = HttpUtils.getMiddleString(aES.get(1).attr("href"), "tid=", "&");
+                    pid = HttpUtils.getMiddleString(aES.get(1).attr("href"), "pid=", "#");
+                } else {
+                    tid = HttpUtils.getMiddleString(aES.get(0).attr("href"), "tid=", "&");
+                }
+                author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", " 引用并通知您。");
+                String yourInfo = HttpUtils.getMiddleString(quoteES.toString(), "</div>", "[/quote]");
+                String quoteInfo = HttpUtils.getMiddleString(quoteES.toString(), "引用摘要:</strong>", "<br>");
+                smsDetail = "<u>您的帖子:</u>" + yourInfo + "<br><u>" + author + " 说:</u>" + quoteInfo;
+            } else if(type.contains("您发表的帖子被回复")) {
+                author = HttpUtils.getMiddleString(quoteES.toString(), "以下您所发表的帖子被 ", " 回复并通知您。");
+                smsDetail = quoteES.toString();
+            } else if (type.contains("您发表的帖子被评分")) {
+                author = HttpUtils.getMiddleString(aES.toString(), "以下您所发表的帖子被 ", " 评分。");
+                for (Element a : aES) {
+                    if (a.attr("href").contains("viewthread.php")) {
+                        tid = HttpUtils.getMiddleString(a.attr("href"), "tid=", "&");
+                        pid = HttpUtils.getMiddleString(a.attr("href"), "pid=", "&");
+                    }
+                }
+                smsDetail = quoteES.toString();
+            } else {
+                String smsTitle = mainBox.select("h1").text();
+                Elements smsDetailES = mainBox.select("table tbody tr td.postcontent");
 
-        Elements postInfoES = smsDetailES.select("p.postinfo").select("a");
-        //get my uid and username
-        String smsTime = HttpUtils.getMiddleString(smsDetailES.select("p.postinfo").text(), "时间:", ",");
-        String myUsername = postInfoES.get(1).text();
-        String myUid = HttpUtils.getMiddleString(postInfoES.get(1).attr("href"),"uid-",".");
-        String author = postInfoES.get(0).text();
-        String authorUid = HttpUtils.getMiddleString(postInfoES.get(0).attr("href"),"uid-",".");
+                Elements postInfoES = smsDetailES.select("p.postinfo").select("a");
+                //get my uid and username
+                smsTime = HttpUtils.getMiddleString(smsDetailES.select("p.postinfo").text(), "时间:", ",");
+                Element myUserInfo = postInfoES.size() == 1 ? postInfoES.get(0) : postInfoES.get(1);
+                String myUsername = postInfoES.size() == 1 ? myUserInfo.text() : myUserInfo.text();
+                String myUid = HttpUtils.getMiddleString(myUserInfo.attr("href"), "uid-", ".");
+                author = postInfoES.get(0).text();
+                authorUid = HttpUtils.getMiddleString(postInfoES.get(0).attr("href"), "uid-", ".");
 
-        Elements postmessageES = smsDetailES.select("div.postmessage");
-        String smsTitle = postmessageES.select("a").text();
-        String mySmsDetail = postmessageES.select("div.quote blockquote").text();
-        String authorSmsDetail = HttpUtils.getMiddleString(postmessageES.first().toString(), "</div>", "</div>");
-        String smsDetail = authorSmsDetail;
+                Elements postmessageES = smsDetailES.select("div.postmessage");
+                String mySmsDetail = postmessageES.select("div.quote blockquote").text();
+                String authorSmsDetail = HttpUtils.getMiddleString(postmessageES.first().toString(), "<div data-plugin=\"autoitem\" class=\"postmessage\">", "</div>");
+                smsDetail = authorSmsDetail;
+            }
+        } else if(doc.text().contains("您的信箱已满")) {
+            author = "系统消息";
+            authorUid = "0";
+            smsDetail = "您的信箱已满，在阅读短消息前，请使用浏览器删除一些不用的信息。";
+        } else {
+            return null;
+        }
+            SimpleListBean list = new SimpleListBean();
+            SimpleListItemBean item = new SimpleListItemBean();
 
-        SimpleListBean list = new SimpleListBean();
-        SimpleListItemBean item = new SimpleListItemBean();
+            // link
+            item.setTid(tid);
+            item.setPid(pid);
 
-        // author
-        item.setAuthor(author);
-        item.setUid(authorUid);
+            // author
+            item.setAuthor(author);
+            item.setUid(authorUid);
 
-        // avatar
-        item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
+            // avatar
+            item.setAvatarUrl(HiUtils.getAvatarUrlByUid(item.getUid()));
 
 
-        // time
-        item.setTime(smsTime);
+            // time
+            item.setTime(smsTime);
 
-        // info
-        item.setInfo(smsDetail);
+            // info
+            item.setInfo(smsDetail);
 
         // new
         list.add(item);

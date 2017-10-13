@@ -80,7 +80,7 @@ public class LoginDialog extends Dialog {
         etPassword.setOnTouchListener(new View.OnTouchListener(){
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-//                new DownImgAsyncTask().execute(SecCodeURL);
+                new DownImgAsyncTask().execute(SecCodeURL);
                 return false;
             }
         });
@@ -88,7 +88,7 @@ public class LoginDialog extends Dialog {
         ivSecCodeVerify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                new DownImgAsyncTask().execute(SecCodeURL);
+                new DownImgAsyncTask().execute(SecCodeURL);
             }
         });
 
@@ -144,14 +144,14 @@ public class LoginDialog extends Dialog {
                             Toast.makeText(mCtx, loginHelper.getErrorMsg(), Toast.LENGTH_SHORT).show();
                             if (result == Constants.STATUS_SECCODE_FAIL_ABORT){
                                 HiSettingsHelper.getInstance().setSecCodeVerity("");
-//                                new DownImgAsyncTask().execute(SecCodeURL);
+                                new DownImgAsyncTask().execute(SecCodeURL);
                             } else {
                                 HiSettingsHelper.getInstance().setUsername("");
                                 HiSettingsHelper.getInstance().setPassword("");
                                 HiSettingsHelper.getInstance().setSecQuestion("");
                                 HiSettingsHelper.getInstance().setSecAnswer("");
                                 HiSettingsHelper.getInstance().setSecCodeVerity("");
-//                                new DownImgAsyncTask().execute(SecCodeURL);
+                                new DownImgAsyncTask().execute(SecCodeURL);
                             }
                             if (mHandler != null) {
                                 Message msg = Message.obtain();

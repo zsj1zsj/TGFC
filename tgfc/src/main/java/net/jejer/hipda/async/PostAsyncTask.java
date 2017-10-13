@@ -1,8 +1,14 @@
 package net.jejer.hipda.async;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import net.jejer.hipda.R;
@@ -11,8 +17,11 @@ import net.jejer.hipda.bean.PostBean;
 import net.jejer.hipda.bean.PrePostInfoBean;
 import net.jejer.hipda.okhttp.OkHttpHelper;
 import net.jejer.hipda.utils.Constants;
+import net.jejer.hipda.utils.CursorUtils;
+import net.jejer.hipda.utils.FormFile;
 import net.jejer.hipda.utils.HiUtils;
 import net.jejer.hipda.utils.HttpUtils;
+import net.jejer.hipda.utils.ImageFileInfo;
 import net.jejer.hipda.utils.Logger;
 import net.jejer.hipda.utils.Utils;
 
@@ -20,10 +29,25 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
+
+    public final static int MAX_QUALITY = 90;
+    private static final int THUMB_SIZE = 128;
+
+    private final static int MAX_PIXELS = 1200 * 1200; //file with this resolution, it's size should match to MAX_IMAGE_FILE_SIZE
+    public final static int MAX_IMAGE_FILE_SIZE = 400 * 1024; // max file size 400K
+    public final static int MAX_SPECIAL_FILE_SIZE = 500 * 1024; // max upload file size : 8M
+
+    private String mMessage = "";
+    private String mCurrentFileName = "";
+    private String mCurrentFileType = "";
+    private Bitmap mThumb;
 
     public static final int MODE_REPLY_THREAD = 0;
     public static final int MODE_REPLY_POST = 1;
@@ -69,6 +93,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         String floor = postBean.getFloor();
         String subject = postBean.getSubject();
         String typeid = postBean.getTypeid();
+        Map<Uri, String> images = postBean.getImages();
 
         String page = postBean.getPage();
         String score = postBean.getScore();
@@ -114,19 +139,19 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         switch (mMode) {
             case MODE_REPLY_THREAD:
             case MODE_QUICK_REPLY:
-                doPost(url, replyText, null, null);
+                doPost(url, replyText, null, null, images);
                 break;
             case MODE_REPLY_POST:
             case MODE_QUOTE_POST:
-                doPost(url, mInfo.getText() + "\n\n    " + replyText, null, null);
+                doPost(url, mInfo.getText() + "\n\n    " + replyText, null, null, images);
                 break;
             case MODE_NEW_THREAD:
                 url = HiUtils.NewThreadUrl + fid + "&typeid=" + typeid + "&topicsubmit=yes";
-                doPost(url, replyText, subject, null);
+                doPost(url, replyText, subject, null, images);
                 break;
             case MODE_EDIT_POST:
                 url = HiUtils.EditUrl + "&extra=&editsubmit=yes&mod=&editsubmit=yes" + "&fid=" + fid + "&tid=" + tid + "&pid=" + pid + "&page=1";
-                doPost(url, replyText, subject, typeid);
+                doPost(url, replyText, subject, typeid, images);
                 break;
         }
 
@@ -143,7 +168,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
             mPostListenerCallback.onPostDone(mMode, mStatus, mResult, postBean);
     }
 
-    private void doPost(String url, String replyText, String subject, String typeid) {
+    private void doPost(String url, String replyText, String subject, String typeid, Map<Uri, String> images) {
 
         String formhash = mInfo != null ? mInfo.getFormhash() : null;
 
@@ -159,15 +184,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         post_param.put("wysiwyg", "0");
         post_param.put("checkbox", "0");
         post_param.put("message", replyText);
-        for (String attach : mInfo.getAttaches()) {
-            post_param.put("attachnew[" + attach + "][description]", attach);
-        }
-        for (String attach : mInfo.getAttachdel()) {
-            post_param.put("attachdel[" + attach + "]", attach);
-        }
-        for (String attach : mInfo.getUnusedImages()) {
-            post_param.put("attachdel[" + attach + "]", attach);
-        }
+
         if (mMode == MODE_NEW_THREAD) {
             post_param.put("subject", subject);
             post_param.put("attention_add", "1");
@@ -196,7 +213,30 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
 
         String rsp_str;
         try {
-            rsp_str = OkHttpHelper.getInstance().post(url, post_param);
+            if (images != null) {
+                FormFile[] files = new FormFile[images.size()];
+                int i = 0;
+                for(Uri uri : images.keySet()){
+                    mCurrentFileName = "";
+                    mCurrentFileType = "";
+
+                    ImageFileInfo imageFileInfo = CursorUtils.getImageFileInfo(mCtx, uri);
+                    mCurrentFileName = imageFileInfo.getFileName();
+                    mCurrentFileType = imageFileInfo.getMime();
+
+                    ByteArrayOutputStream baos = compressImage(uri, imageFileInfo);
+                    if (baos == null) {
+                        return;
+                    }
+
+                    files[i]= new FormFile(mCurrentFileName, baos.toByteArray(), String.valueOf(i+1), mCurrentFileType);
+                    i++;
+                }
+                rsp_str = PostFilesHelper.post( url, post_param, files);
+//                rsp_str = OkHttpHelper.getInstance().postImages(url, post_param, images);
+            } else {
+                rsp_str = OkHttpHelper.getInstance().post(url, post_param);
+            }
 
             //when success, okhttp will follow 302 redirect get the page content
             if (!TextUtils.isEmpty(rsp_str)) {
@@ -291,5 +331,155 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
         void onPrePost();
 
         void onPostDone(int mode, int status, String message, PostBean postBean);
+    }
+
+    private ByteArrayOutputStream compressImage(Uri uri, ImageFileInfo imageFileInfo) {
+
+        if (imageFileInfo.isGif()
+                && imageFileInfo.getFileSize() > MAX_SPECIAL_FILE_SIZE) {
+            mMessage = "GIF图片大小不能超过" + Utils.toSizeText(MAX_SPECIAL_FILE_SIZE);
+            return null;
+        }
+
+        Bitmap bitmap;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(mCtx.getContentResolver(), uri);
+        } catch (Exception e) {
+            Logger.v("Exception", e);
+            mMessage = "无法获取图片 : " + e.getMessage();
+            return null;
+        }
+
+        //gif or very long image or small images etc
+        if (isDirectUploadable(imageFileInfo)) {
+            mThumb = ThumbnailUtils.extractThumbnail(bitmap, THUMB_SIZE, THUMB_SIZE);
+            bitmap.recycle();
+            return readFileToStream(imageFileInfo.getFilePath());
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, MAX_QUALITY, baos);
+
+        if (baos.size() <= MAX_IMAGE_FILE_SIZE) {
+            mThumb = ThumbnailUtils.extractThumbnail(bitmap, THUMB_SIZE, THUMB_SIZE);
+            bitmap.recycle();
+            bitmap = null;
+            return baos;
+        }
+        bitmap.recycle();
+        bitmap = null;
+
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(isBm, null, opts);
+
+        int width = opts.outWidth;
+        int height = opts.outHeight;
+
+        //inSampleSize is needed to avoid OOM
+        int be = (int) (Math.max(width, height) * 1.0 / 1500);
+        if (be <= 0)
+            be = 1; //be=1表示不缩放
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        newOpts.inJustDecodeBounds = false;
+        newOpts.inSampleSize = be;
+
+        isBm = new ByteArrayInputStream(baos.toByteArray());
+        Bitmap newbitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
+
+        width = newbitmap.getWidth();
+        height = newbitmap.getHeight();
+
+        //scale bitmap so later compress could run less times, once is the best result
+        //rotate if needed
+        if ((baos.size() > MAX_IMAGE_FILE_SIZE
+                && width * height > MAX_PIXELS)
+                || imageFileInfo.getOrientation() > 0) {
+
+            float scale = 1.0f;
+            if (width * height > MAX_PIXELS) {
+                scale = (float) Math.sqrt(MAX_PIXELS * 1.0 / (width * height));
+            }
+
+            Matrix matrix = new Matrix();
+            if (imageFileInfo.getOrientation() > 0)
+                matrix.postRotate(imageFileInfo.getOrientation());
+            matrix.postScale(scale, scale);
+
+            Bitmap scaledBitmap = Bitmap.createBitmap(newbitmap, 0, 0, newbitmap.getWidth(),
+                    newbitmap.getHeight(), matrix, true);
+
+            newbitmap.recycle();
+            newbitmap = scaledBitmap;
+        }
+
+        int quality = MAX_QUALITY;
+        baos.reset();
+        newbitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        while (baos.size() > MAX_IMAGE_FILE_SIZE) {
+            quality -= 10;
+            if (quality <= 0) {
+                mMessage = "无法压缩图片至指定大小 " + Utils.toSizeText(MAX_IMAGE_FILE_SIZE);
+                return null;
+            }
+            baos.reset();
+            newbitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos);
+        }
+
+        mThumb = ThumbnailUtils.extractThumbnail(newbitmap, THUMB_SIZE, THUMB_SIZE);
+        newbitmap.recycle();
+        newbitmap = null;
+
+        System.gc();
+        return baos;
+    }
+
+    private boolean isDirectUploadable(ImageFileInfo imageFileInfo) {
+        long fileSize = imageFileInfo.getFileSize();
+        int w = imageFileInfo.getWidth();
+        int h = imageFileInfo.getHeight();
+
+        if (TextUtils.isEmpty(imageFileInfo.getFilePath()))
+            return false;
+
+        if (imageFileInfo.getOrientation() > 0)
+            return false;
+
+        //gif image
+        if (imageFileInfo.isGif() && fileSize <= MAX_SPECIAL_FILE_SIZE)
+            return true;
+
+        //very long or wide image
+        if (w > 0 && h > 0 && fileSize <= MAX_SPECIAL_FILE_SIZE) {
+            if (Math.max(w, h) * 1.0 / Math.min(w, h) >= 3)
+                return true;
+        }
+
+        //normal image
+        return fileSize <= MAX_IMAGE_FILE_SIZE;
+    }
+
+    private static ByteArrayOutputStream readFileToStream(String file) {
+        FileInputStream fileInputStream = null;
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            fileInputStream = new FileInputStream(file);
+            int readedBytes;
+            byte[] buf = new byte[1024];
+            while ((readedBytes = fileInputStream.read(buf)) > 0) {
+                bos.write(buf, 0, readedBytes);
+            }
+            return bos;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            try {
+                if (fileInputStream != null)
+                    fileInputStream.close();
+            } catch (Exception ignored) {
+
+            }
+        }
     }
 }

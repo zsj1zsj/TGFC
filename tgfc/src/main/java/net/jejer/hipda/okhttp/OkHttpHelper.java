@@ -97,7 +97,6 @@ public class OkHttpHelper {
         Request.Builder reqBuilder = new Request.Builder();
         reqBuilder.url(url)
                 .header("User-Agent", HiUtils.getUserAgent())
-//                .addHeader("Referer",url)
                 .post(requestBody);
 
         if (tag != null)

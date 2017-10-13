@@ -241,7 +241,8 @@ public class HiParserThreadDetail {
                 if (poststatusES.size() > 0) {
                     poststatus = poststatusES.first().text();
                     //remove then it will not show in content
-                    poststatusES.first().remove();
+                    //保留引用者信息
+                    //poststatusES.first().remove();
                 }
 
             //wap platform

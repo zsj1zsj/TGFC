@@ -79,6 +79,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
     private String mFloorAuthor;
     private String mText;
     private String mTypeid = "0";
+    private int mImgId = 0;
     private int mMode;
     private TextView mTvAdditional;
     private EditText mEtSubjectMsg;
@@ -91,6 +92,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
     private Spinner mSpTypeIds;
 
     private Map<Uri, UploadImgButton> mUploadImgButtons = new HashMap<>();
+    private Map<Uri, String> mImages = new HashMap<>();
     private HorizontalScrollView mHsvView;
     private HiProgressDialog mProgressDialog;
     private boolean mImageUploading = false;
@@ -326,7 +328,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
                 } else {
                     Intent intent = new Intent();
                     intent.setType("image/*");
-                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    intent.setAction(Intent.ACTION_PICK);
                     if (Build.VERSION.SDK_INT >= 18)
                         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                     startActivityForResult(Intent.createChooser(intent,
@@ -343,7 +345,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
             Toast.makeText(getActivity(), "请等待信息收集结束再发送", Toast.LENGTH_LONG).show();
 
         if (mSpTypeIds.getVisibility() == View.VISIBLE && (HiUtils.FID_BS + "").equals(mFid) && "0".equals(mTypeid)) {
-            Toast.makeText(getActivity(), "B&S版发帖必须指定分类", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "发帖必须指定分类", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -369,7 +371,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
             boolean needWarn = false;
             for (UploadImgButton uploadBtn : mUploadImgButtons.values()) {
                 if (isValidImgId(uploadBtn.getImgId())) {
-                    String attachStr = "[attachimg]" + uploadBtn.getImgId() + "[/attachimg]";
+                    String attachStr = "[local]" + uploadBtn.getImgId() + "[/local]";
                     if (!replyText.contains(attachStr)) {
                         needWarn = true;
                         uploadBtn.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.orange));
@@ -390,6 +392,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
         postBean.setTypeid(mTypeid);
         postBean.setSubject(subjectText);
         postBean.setFloor(mFloor);
+        postBean.setImages(mImages);
 
         new PostAsyncTask(getActivity(), mMode, mPrePostInfo, postListener).execute(postBean);
 
@@ -436,8 +439,8 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
                 return;
             }
 
-            mProgressDialog = new HiProgressDialog(getActivity());
-            mProgressDialog.show();
+//            mProgressDialog = new HiProgressDialog(getActivity());
+//            mProgressDialog.show();
 
             //generate upload image buttons
             for (Uri uri : uris) {
@@ -471,7 +474,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
 
                         uploadBtn.setVisibility(View.GONE);
                         if (!TextUtils.isEmpty(mEtReplyMsg.getText()) && isValidImgId(uploadBtn.getImgId()))
-                            mEtReplyMsg.setText(mEtReplyMsg.getText().toString().replace("[attachimg]" + uploadBtn.getImgId() + "[/attachimg]", ""));
+                            mEtReplyMsg.setText(mEtReplyMsg.getText().toString().replace("[local]" + uploadBtn.getImgId() + "[/local]", ""));
                         if (mUploadImgButtons.size() == 0 && mHsvView.getVisibility() == View.VISIBLE)
                             mHsvView.setVisibility(View.GONE);
                         return true;
@@ -496,15 +499,26 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
                 imagesLayout.addView(uploadBtn, params);
             }
 
+            //图片编号
+            for (Uri uri : uris) {
+                UploadImgButton uploadBtn = mUploadImgButtons.get(uri);
+                mImgId = mImgId + 1;
+                uploadBtn.setImgId(String.valueOf(mImgId));
+                uploadBtn.setImageURI(uri);
+                uploadBtn.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.hipda));
+                mImages.put(uri,String.valueOf(mImgId));
+                appendImage(String.valueOf(mImgId));
+            }
+
             //upload all images
-            new UploadImgAsyncTask(getActivity(), this, mPrePostInfo.getUid(), mPrePostInfo.getHash()).execute(uris.toArray(new Uri[uris.size()]));
+//            new UploadImgAsyncTask(getActivity(), this, mPrePostInfo.getUid(), mPrePostInfo.getHash()).execute(uris.toArray(new Uri[uris.size()]));
 
         }
     }
 
     public void appendImage(String imgId) {
         if (isValidImgId(imgId)) {
-            mEtReplyMsg.getText().insert(mEtReplyMsg.getSelectionStart(), "\n[attachimg]" + imgId + "[/attachimg]");
+            mEtReplyMsg.getText().insert(mEtReplyMsg.getSelectionStart(), "\n[local]" + imgId + "[/local]");
             mPrePostInfo.addAttach(imgId);
         }
     }
@@ -533,10 +547,12 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
                     public void run() {
                         UploadImgButton uploadBtn = mUploadImgButtons.get(uri);
                         if (isValidImgId(imgId)) {
-                            uploadBtn.setImgId(imgId);
-                            uploadBtn.setImageBitmap(thumbtail);
+                            mImgId = mImgId + 1;
+                            uploadBtn.setImgId(String.valueOf(mImgId));
+                            uploadBtn.setImageURI(uri);
                             uploadBtn.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.hipda));
-                            appendImage(imgId);
+                            mImages.put(uri,String.valueOf(mImgId));
+                            appendImage(String.valueOf(mImgId));
                         } else {
                             Toast.makeText(getActivity(), "图片上传失败："
                                     + (!TextUtils.isEmpty(fileName) ? fileName : "")
@@ -675,7 +691,7 @@ public class PostFragment extends BaseFragment implements UploadImgAsyncTask.Upl
     private boolean isValidImgId(String imgId) {
         return !TextUtils.isEmpty(imgId)
                 && TextUtils.isDigitsOnly(imgId)
-                && imgId.length() > 1;
+                && imgId.length() >= 1;
     }
 
     public boolean isUserInputted() {
