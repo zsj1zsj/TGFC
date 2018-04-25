@@ -12,17 +12,22 @@ import net.jejer.hipda.bean.DetailBean.Contents;
 import net.jejer.hipda.bean.DetailListBean;
 import net.jejer.hipda.bean.HiSettingsHelper;
 import net.jejer.hipda.cache.SmallImages;
+import net.jejer.hipda.okhttp.OkHttpHelper;
 import net.jejer.hipda.ui.ThreadDetailFragment;
 import net.jejer.hipda.ui.ThreadListFragment;
 import net.jejer.hipda.ui.textstyle.TextStyle;
 import net.jejer.hipda.ui.textstyle.TextStyleHolder;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,8 +38,29 @@ public class HiParserThreadDetail {
 
     public static DetailListBean parse(Context ctx, Handler handler, Document doc, boolean parseTid) {
 
+        boolean isVoteThread = doc.select("div.wrap div.specialthread").size() > 0;
+        Document voteDoc = null;
+        if(isVoteThread){
+            String path = "";
+            Elements scriptES = doc.select("script");
+            if (scriptES.size() > 0){
+                for (Element e : scriptES){
+                    if(e.toString().contains("ajaxspecialpost")){
+                        path = HttpUtils.getMiddleString(e.toString(), "ajaxget('","', 'ajaxspecialpost'");
+                    }
+                }
+            }
+            Map<String, String> params = new HashMap<>();
+            String voteRsp;
+            try {
+                voteRsp = OkHttpHelper.getInstance().post(HiUtils.BaseUrl + path, params);
+                voteDoc = Jsoup.parse(voteRsp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         // get last page
-        Elements pagesES = doc.select("div.wrap div.pages_btns div.pages");
+        Elements pagesES = isVoteThread ? voteDoc.select("div.wrap div.pages_btns div.pages") : doc.select("div.wrap div.pages_btns div.pages");
         // thread have only 1 page don't have "div.pages"
         pagesES.select("em").remove();
         int last_page = 1;
@@ -106,18 +132,40 @@ public class HiParserThreadDetail {
             }
         }
 
-        Elements rootES = doc.select("form[name=\"modactions\"]");
+        Elements rootES = isVoteThread ?  voteDoc.select("form[name=\"modactions\"]") : doc.select("form[name=\"modactions\"]");
         if (rootES.size() != 1) {
             return null;
         }
 
-        Elements postsEL = rootES.select("div.viewthread");
+        if(isVoteThread && page == 1){
+            Element voteE = doc.select("div.specialthread table").first();
+            DetailBean voteDetail = new DetailBean();
+            //id
+            voteDetail.setPostId(HttpUtils.getMiddleString(voteE.select("cite a").first().attr("href"),"uid-",".html"));
+            //time
+            voteDetail.setTimePost("2017");
+            //floor
+            voteDetail.setFloor("0");
+            //author
+            voteDetail.setAuthor(voteE.select("cite a").text());
+            //avatar
+            voteDetail.setAvatarUrl(HiUtils.BaseUrl + voteE.select("div.avatar img").first().attr("src"));
+            //content
+            Contents content = voteDetail.getContents();
+            TextStyle ts = new TextStyle();
+            String text = ts.toHtml(voteE.select("div.postmessage").toString());
+            content.addText(text, ts);
+
+            details.add(voteDetail);
+        }
+
+        Elements postsEL = isVoteThread ? rootES.select("div.specialpost") : rootES.select("div.viewthread");
         for (int i = 0; i < postsEL.size(); i++) {
             Element postE = postsEL.get(i);
                 DetailBean detail = new DetailBean();
 
                 //id
-                String id = postE.select("table").attr("id");
+                String id = isVoteThread ? "pid" + HttpUtils.getMiddleString(postE.select("div.postinfo h2 a").attr("id"),"author_","") : postE.select("table").attr("id");
                 if (id.length() < "pid".length()) {
                     continue;
                 }
@@ -125,18 +173,21 @@ public class HiParserThreadDetail {
                 detail.setPostId(id);
 
                 //time
-                Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo").clone();
-                timeEMES.select("strong").remove();
-                timeEMES.select("em").remove();
-                timeEMES.select("a").remove();
-                if (timeEMES.size() == 0) {
-                    continue;
+                if(isVoteThread){
+                    detail.setTimePost(postE.select("div.postinfo h2").text());
+                } else {
+                    Elements timeEMES = postE.select("table tbody tr td.postcontent div.postinfo").clone();
+                    timeEMES.select("strong").remove();
+                    timeEMES.select("em").remove();
+                    timeEMES.select("a").remove();
+                    if (timeEMES.size() == 0) {
+                        continue;
+                    }
+                    String time = timeEMES.first().text();
+                    detail.setTimePost(time);
                 }
-                String time = timeEMES.first().text();
-                detail.setTimePost(time);
-
                 //floor
-                Elements postinfoAES = postE.select("table tbody tr td.postcontent div.postinfo strong");
+                Elements postinfoAES = isVoteThread ? postE.select("div.postinfo strong") : postE.select("table tbody tr td.postcontent div.postinfo strong");
                 postinfoAES.remove("sup");
                 if (postinfoAES.size() == 0) {
                     continue;
@@ -155,12 +206,12 @@ public class HiParserThreadDetail {
                 }
 
                 //author
-                Elements postauthorAES = postE.select("table tbody tr td.postauthor cite a");
+                Elements postauthorAES = isVoteThread ? postE.select("div.postinfo h2 a") : postE.select("table tbody tr td.postauthor cite a");
                 if (postauthorAES.size() == 0) {
                     continue;
                 }
                 String uidUrl = postauthorAES.first().attr("href");
-                String uid = HttpUtils.getMiddleString(uidUrl, "uid-", ".");
+                String uid = isVoteThread ? HttpUtils.getMiddleString(uidUrl, "uid=", "") : HttpUtils.getMiddleString(uidUrl, "uid-", ".");
                 Logger.v(uid);
                 if (uid != null) {
                     detail.setUid(uid);
@@ -190,7 +241,7 @@ public class HiParserThreadDetail {
 
                 //content
                 Contents content = detail.getContents();
-                Elements postmessageES = postE.select("table tbody tr td.postcontent div.defaultpost div.t_msgfont");
+                Elements postmessageES = isVoteThread ?  postE.select("div.postmessage div.t_msgfont") : postE.select("table tbody tr td.postcontent div.defaultpost div.t_msgfont");
 
                 //locked user content
                 if (postmessageES.size() == 0) {
@@ -237,13 +288,13 @@ public class HiParserThreadDetail {
 
                 //post status
             String poststatus = "";
-                Elements poststatusES = postmessageE.select("i");
-                if (poststatusES.size() > 0) {
-                    poststatus = poststatusES.first().text();
-                    //remove then it will not show in content
-                    //保留引用者信息
-                    //poststatusES.first().remove();
-                }
+            Elements poststatusES = postmessageE.select("i");
+            if (poststatusES.size() > 0) {
+                poststatus = poststatusES.first().text();
+                //remove then it will not show in content
+                //保留引用者信息
+                //poststatusES.first().remove();
+            }
 
             //wap platform
             Elements postplatformES = postmessageE.select("font[color=DarkRed] font[size=2]");

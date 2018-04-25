@@ -98,16 +98,18 @@ public class PrePostAsyncTask extends AsyncTask<PostBean, Void, PrePostInfoBean>
 
         Elements formhashES = doc.select("input[name=formhash]");
         if (formhashES.size() < 1) {
+            result.setText(doc.select("div.message p").get(0).text());
+//            result.setFormhash(HttpUtils.getMiddleString(doc.select("div#footlinks").select("a").get(0).attr("href"),"formhash=",""));
             return result;
         } else {
             result.setFormhash(formhashES.first().attr("value"));
         }
 
         Elements ratingAmES = doc.select("em.tips");
-        if (formhashES.size() < 1) {
+        if (ratingAmES.size() < 1) {
             return result;
         } else {
-            result.setRatingAmount(ratingAmES.first().text().replace("( 今日还能评分 ", "").replace(" )", ""));
+            result.setRatingAmount(HttpUtils.getMiddleString(ratingAmES.first().text(), "还能评分 ", " 度"));
         }
 
         Elements addtextES = doc.select("textarea");

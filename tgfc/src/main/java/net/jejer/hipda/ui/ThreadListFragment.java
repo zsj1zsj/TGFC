@@ -467,7 +467,7 @@ public class ThreadListFragment extends BaseFragment
             int page = 1;
             int maxPostsInPage = HiSettingsHelper.getInstance().getMaxPostsInPage();
             if (maxPostsInPage > 0 && TextUtils.isDigitsOnly(thread.getCountCmts())) {
-                page = (int) Math.ceil((Integer.parseInt(thread.getCountCmts()) + 1) * 1.0f / maxPostsInPage);
+                page = (int) Math.ceil((Integer.parseInt(thread.getCountCmts())) * 1.0f / maxPostsInPage);
             }
             setHasOptionsMenu(false);
             FragmentUtils.showThread(getFragmentManager(), false, tid, title, page, ThreadDetailFragment.LAST_FLOOR, null, thread.getMaxPage());

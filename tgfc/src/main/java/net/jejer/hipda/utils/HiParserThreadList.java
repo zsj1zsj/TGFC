@@ -82,11 +82,17 @@ public class HiParserThreadList {
                 continue;
             }
 
+            // is vote thread
+            Boolean isVote = false;
+            if (tbodyE.select("td.icon img").size() > 0) {
+                isVote = tbodyE.select("td.icon img").attr("alt").contains("投票");
+            }
+
             Elements titleES = tbodyE.select("span#" + idThread);
             if (titleES.size() == 0) {
                 continue;
             }
-            String title = titleES.first().text();
+            String title = isVote ? "[投票]"+titleES.first().text() : titleES.first().text();
             thread.setTitle(title);
 
             Elements typeES = tbodyE.select("th.subject em a");

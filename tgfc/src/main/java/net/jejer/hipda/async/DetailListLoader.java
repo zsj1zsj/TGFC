@@ -31,16 +31,18 @@ public class DetailListLoader extends AsyncTaskLoader<DetailListBean> {
 
     private final Object mLocker = new Object();
     private String mTid;
+    private String mTitle;
     private String mGotoPostId;
     private int mPage;
     private String mRsp;
     private DetailListBean data;
 
-    public DetailListLoader(Context context, Handler handler, String tid, String gotoPostId, int page) {
+    public DetailListLoader(Context context, Handler handler, String tid, String gotoPostId, String title, int page) {
         super(context);
         mCtx = context;
         mHandler = handler;
         mTid = tid;
+        mTitle = title;
         mGotoPostId = gotoPostId;
         mPage = page;
     }
@@ -115,6 +117,9 @@ public class DetailListLoader extends AsyncTaskLoader<DetailListBean> {
         } else {
             mUrl = HiUtils.DetailListUrl + mTid + "&page=" + mPage;
         }
+
+//        if(mTitle.contains("[投票]"))
+//            mUrl = mUrl+"&do=viewspecialpost";
 
         OkHttpHelper.getInstance().asyncGet(mUrl, new DetailListCallback(), TextUtils.isEmpty(mTid) ? null : "tid=" + mTid);
     }

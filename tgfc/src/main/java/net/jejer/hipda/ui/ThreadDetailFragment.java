@@ -662,7 +662,7 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
             mDetailListView.setPullLoadEnable(false, mCurrentPage == mMaxPage);
             mDetailListView.setPullRefreshEnable(false, mCurrentPage == 1 ? mTitle : null);
 
-            return new DetailListLoader(mCtx, mMsgHandler, mTid, mGotoPostId, args.getInt(LOADER_PAGE_KEY, 1));
+            return new DetailListLoader(mCtx, mMsgHandler, mTid, mGotoPostId, mTitle, args.getInt(LOADER_PAGE_KEY, 1));
         }
 
         @Override
@@ -967,7 +967,12 @@ public class ThreadDetailFragment extends BaseFragment implements PostAsyncTask.
                         postBean.setFloor(String.valueOf(rFloor));
                         postBean.setPage(String.valueOf(mCurrentPage));
                         postBean.setScore(score);
-                        postBean.setReason(etReason.getText().toString());
+                        String reason = etReason.getText().toString();
+                        if(TextUtils.isEmpty(reason)){
+                            postBean.setReason("评分");
+                        }else{
+                            postBean.setReason(reason);
+                        }
 
                         if (!score.equals("激骚度") || !score.equals("--------")) {
                             new PostAsyncTask(getActivity(), PostAsyncTask.MODE_RATING_POST, null, ThreadDetailFragment.this).execute(postBean);

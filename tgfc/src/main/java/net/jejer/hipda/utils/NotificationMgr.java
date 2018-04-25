@@ -108,25 +108,25 @@ public class NotificationMgr {
             }
         }
         //check new thread notify
-        if (doc != null) {
-            try {
-                String response = OkHttpHelper.getInstance().get(HiUtils.NewSMS);
-                if (!TextUtils.isEmpty(response)) {
-                    doc = Jsoup.parse(response);
-                    SimpleListBean listBean = HiParser.parseNotify(doc);
-                    if (listBean != null) {
-                        List<SimpleListItemBean> itemBean = listBean.getAll();
-                        for (SimpleListItemBean threadItem : itemBean) {
-                            if (threadItem.isNew()) {
-                                threadCount += 1;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Logger.e(e);
-            }
-        }
+//        if (doc != null) {
+//            try {
+//                String response = OkHttpHelper.getInstance().get(HiUtils.NewSMS);
+//                if (!TextUtils.isEmpty(response)) {
+//                    doc = Jsoup.parse(response);
+//                    SimpleListBean listBean = HiParser.parseNotify(doc);
+//                    if (listBean != null) {
+//                        List<SimpleListItemBean> itemBean = listBean.getAll();
+//                        for (SimpleListItemBean threadItem : itemBean) {
+//                            if (threadItem.isNew()) {
+//                                threadCount += 1;
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch (Exception e) {
+//                Logger.e(e);
+//            }
+//        }
 
         if (threadCount >= 0)
             mCurrentBean.setThreadCount(threadCount);

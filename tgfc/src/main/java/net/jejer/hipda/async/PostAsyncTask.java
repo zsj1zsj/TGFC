@@ -278,13 +278,16 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
     private void doRatingPost(String url, String tid, String pid, String page, String score, String reason) {
 
         String formhash = mInfo != null ? mInfo.getFormhash() : null;
-        int ratingAmount = Integer.parseInt(mInfo != null ? mInfo.getRatingAmount() : null) - Math.abs(Integer.parseInt(score));
 
         if (TextUtils.isEmpty(formhash)) {
-            mResult = "评分失败，无法获取必要信息 ！";
+//            mResult = "评分失败，无法获取必要信息 ！";
+            mResult = mInfo.getText();
             mStatus = Constants.STATUS_FAIL;
             return;
         }
+
+        int ratingAmount = Integer.parseInt(mInfo != null ? mInfo.getRatingAmount() : null) - Math.abs(Integer.parseInt(score));
+
 
         Map<String, String> post_param = new HashMap<>();
         post_param.put("formhash", formhash);
@@ -306,7 +309,7 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
                 if (rsp_str.contains(mCtx.getString(R.string.rating_success))) {
                     Logger.v("Rating success!");
                     mTid = tid;
-                    mResult = "评分成功,您今日还能剩 " + ratingAmount + " 评分。";
+                    mResult = "评分成功,您今日还能使用 " + ratingAmount + " 评分。";
                     mStatus = Constants.STATUS_SUCCESS;
                 } else if (rsp_str.contains(mCtx.getString(R.string.rating_fail))) {
                     Logger.e("Rating FAIL");

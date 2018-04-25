@@ -8,8 +8,8 @@ android {
         applicationId "net.jejer.tgfc.ng"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 20
-        versionName "1.2"
+        versionCode 21
+        versionName "1.2.1"
     }
 
     buildTypes {
