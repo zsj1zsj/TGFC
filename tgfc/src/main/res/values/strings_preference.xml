@@ -260,14 +260,30 @@
         <item>二手交易区</item>
         <item>游戏业界综合讨论区</item>
         <item>主机游戏讨论区</item>
-        <item>手机和掌机游戏讨论区</item>
+        <item>主机和掌机游戏讨论区</item>
         <item>体育运动专区</item>
+        <item>体育赛事直喷专区</item>
         <item>影视专区</item>
+        <item>影视资源</item>
         <item>手机游戏讨论区</item>
         <item>经典游戏怀旧专区</item>
-        <item>动漫模型</item>
+        <item>动漫模玩</item>
         <item>安卓电视游戏讨论区</item>
         <item>硬件维修区</item>
+        <item>旅行度假</item>
+        <item>舌尖上的TG</item>
+        <item>宠物乐园</item>
+        <item>TGFC御宅深喉K歌大赛</item>
+        <item>招聘求职</item>
+        <item>网游业界讨论区</item>
+        <item>英雄联盟</item>
+        <item>暴雪游戏专区</item>
+        <item>ChinaJoy 2013</item>
+        <item>写真摄影服务</item>
+        <item>新品贩卖区</item>
+        <item>神鬼奇谈</item>
+        <item>文史春秋</item>
+        <item>公共工作区</item>
     </string-array>
     <string-array name="pref_title_forum_values">
         <item>25</item>
@@ -280,12 +296,28 @@
         <item>29</item>
         <item>5</item>
         <item>6</item>
+        <item>48</item>
         <item>12</item>
+        <item>104</item>
         <item>5</item>
         <item>101</item>
         <item>11</item>
         <item>103</item>
         <item>45</item>
+        <item>97</item>
+        <item>99</item>
+        <item>95</item>
+        <item>76</item>
+        <item>86</item>
+        <item>67</item>
+        <item>98</item>
+        <item>40</item>
+        <item>65</item>
+        <item>88</item>
+        <item>17</item>
+        <item>72</item>
+        <item>93</item>
+        <item>26</item>
     </string-array>
     <string-array name="default_forum_values">
         <item>25</item>

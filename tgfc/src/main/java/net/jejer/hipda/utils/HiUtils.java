@@ -11,7 +11,7 @@ import net.jejer.hipda.ui.HiApplication;
 
 public class HiUtils {
     public static final String UserAgentPrefix = "TGFC NG";
-    public static final String BaseUrl = "http://club.tgfcer.com/";
+    public static final String BaseUrl = "https://bbs.tgfcer.com/";
     public static final String SecCodeVerifyUrl = BaseUrl + "seccode.php?update=";
     public static final String ThreadListUrl = BaseUrl + "forumdisplay.php?fid=";
     public static final String DetailListUrl = BaseUrl + "viewthread.php?tid=";
@@ -67,15 +67,32 @@ public class HiUtils {
             "二手交易区",
             "游戏业界综合讨论区",
             "主机游戏讨论区",
-            "主机\\掌机游戏讨论区",
+            "主机和掌机游戏讨论区",
             "体育运动专区",
+            "体育赛事直喷专区",
             "影视专区",
+            "影视资源",
             "手机游戏讨论区",
             "经典游戏怀旧专区",
-            "动漫模型",
+            "动漫模玩",
             "安卓电视游戏讨论区",
-            "硬件维修区", };
-    public final static int[] FORUM_IDS = {25, FID_DIGIT, 85, 41, 59, FID_BS, 33, 29, 5, 6, 12, 5, 101, 11, 103, 45};
+            "硬件维修区",
+            "旅行度假",
+            "舌尖上的TG",
+            "宠物乐园",
+            "TGFC御宅深喉K歌大赛",
+            "招聘求职",
+            "网游业界讨论区",
+            "英雄联盟",
+            "暴雪游戏专区",
+            "ChinaJoy 2013",
+            "写真摄影服务",
+            "新品贩卖区",
+            "神鬼奇谈",
+            "文史春秋",
+            "公共工作区"
+    };
+    public final static int[] FORUM_IDS = {25, FID_DIGIT, 85, 41, 59, FID_BS, 33, 29, 5, 6, 48, 12, 104, 5, 101, 11, 103, 45, 97, 99, 95, 76, 86, 67, 98, 40, 65, 88, 17, 72, 93, 26};
     public final static IIcon[] FORUM_ICONS = {
             FontAwesome.Icon.faw_anchor,
             FontAwesome.Icon.faw_mobile_phone,
@@ -87,7 +104,23 @@ public class HiUtils {
             FontAwesome.Icon.faw_gamepad,
             FontAwesome.Icon.faw_credit_card,
             FontAwesome.Icon.faw_soccer_ball_o,
+            FontAwesome.Icon.faw_soccer_ball_o,
             FontAwesome.Icon.faw_video_camera,
+            FontAwesome.Icon.faw_video_camera,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
+            FontAwesome.Icon.faw_sticky_note_o,
             FontAwesome.Icon.faw_sticky_note_o,
             FontAwesome.Icon.faw_sticky_note_o,
             FontAwesome.Icon.faw_sticky_note_o,
