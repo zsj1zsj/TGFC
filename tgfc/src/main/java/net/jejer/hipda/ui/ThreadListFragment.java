@@ -40,6 +40,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.Iconics;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.iconics.view.IconicsImageView;
+import com.mikepenz.materialdrawer.Drawer;
 
 import net.jejer.hipda.R;
 import net.jejer.hipda.async.LoginHelper;
@@ -94,6 +95,9 @@ public class ThreadListFragment extends BaseFragment
     private int mFirstVisibleItem = 0;
 
     private MenuItem mForumTypeMenuItem;
+    private Drawer drawer;
+    private float xDown = 0, xMove = 0, yDown = 0, yMove = 0, distanceX = 0, distanceY = 0;
+    private boolean isSwipeing = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -211,6 +215,9 @@ public class ThreadListFragment extends BaseFragment
 
         mThreadListView.setSelection(mFirstVisibleItem);
 
+        MainFrameActivity mainActivity = (MainFrameActivity) getActivity();
+        drawer = mainActivity.drawer;
+
         return view;
     }
 
@@ -232,6 +239,23 @@ public class ThreadListFragment extends BaseFragment
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 if (mFam.isOpened()) {
                     mFam.close(false);
+                }
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        xDown = motionEvent.getRawX();
+                        yDown = motionEvent.getRawY();
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        xMove = motionEvent.getRawX();
+                        yMove = motionEvent.getRawY();
+                        distanceX = (int) (xMove - xDown);
+                        distanceY = Math.abs(yMove - yDown);
+                        isSwipeing = distanceX > 100 || distanceX < -100;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (distanceX > 100 && distanceY < 150)
+                            drawer.openDrawer();
+                        break;
                 }
                 return false;
             }
@@ -446,6 +470,8 @@ public class ThreadListFragment extends BaseFragment
 
         @Override
         public void onItemSingleClick(AdapterView<?> listView, View itemView, int position, long row) {
+            if (isSwipeing)
+                return;
             //avoid footer click event ???
             if (position >= mThreadListAdapter.getCount())
                 return;
@@ -461,6 +487,8 @@ public class ThreadListFragment extends BaseFragment
     private class OnItemLongClickCallback implements AdapterView.OnItemLongClickListener {
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long row) {
+            if (isSwipeing)
+                return true;
             ThreadBean thread = mThreadListAdapter.getItem(position);
             String tid = thread.getTid();
             String title = thread.getTitle();
