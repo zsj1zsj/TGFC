@@ -51,6 +51,7 @@ public class HiSettingsHelper {
     public static final String PERF_TEXTSIZE_TITLE_ADJ = "PERF_TEXTSIZE_TITLE_ADJ";
     public static final String PERF_SCREEN_ORIENTATION = "PERF_SCREEN_ORIENTATION";
     public static final String PERF_GESTURE_BACK = "PERF_GESTURE_BACK";
+    public static final String PERF_HIDDEN_PLATFORM = "PERF_HIDDEN_PLATFORM";
     public static final String PERF_LAST_UPDATE_CHECK = "PERF_LAST_UPDATE_CHECK";
     public static final String PERF_AUTO_UPDATE_CHECK = "PERF_AUTO_UPDATE_CHECK";
     public static final String PERF_ABOUT = "PERF_ABOUT";
@@ -108,6 +109,7 @@ public class HiSettingsHelper {
     private String mTitleTextSizeAdj = "";
     private int mScreenOrientation = ActivityInfo.SCREEN_ORIENTATION_USER;
     private boolean mGestureBack = true;
+    private boolean mHiddenPlatform = true;
     private int mMaxPostsInPage;
     private int mLastForumId = 0;
     private boolean mErrorReportMode;
@@ -210,6 +212,7 @@ public class HiSettingsHelper {
         getTitleTextsizeAdjFromPref();
         getScreenOrietationFromPref();
         isGestureBackFromPref();
+        isHiddenPlatformPref();
         getPostLineSpacingFromPref();
         getLastForumIdFromPerf();
         isShowPostTypeFromPref();
@@ -742,6 +745,14 @@ public class HiSettingsHelper {
         editor.putBoolean(PERF_GESTURE_BACK, gestureBack).apply();
     }
 
+    public boolean isHiddenPlatform() {
+        return mHiddenPlatform;
+    }
+
+    public boolean isHiddenPlatformPref() {
+        mHiddenPlatform = mSharedPref.getBoolean(PERF_HIDDEN_PLATFORM, false);
+        return mHiddenPlatform;
+    }
     public Date getLastUpdateCheckTime() {
         String millis = mSharedPref.getString(PERF_LAST_UPDATE_CHECK, "");
         if (!TextUtils.isEmpty(millis) && TextUtils.isDigitsOnly(millis)) {
