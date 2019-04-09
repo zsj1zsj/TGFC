@@ -119,11 +119,12 @@ public class PostAsyncTask extends AsyncTask<PostBean, Void, Void> {
 
         if (mMode != MODE_EDIT_POST) {
             String model_text = Build.MODEL.toLowerCase().indexOf(Build.MANUFACTURER.toLowerCase()) < 0 ?
-                    ", " + Build.MANUFACTURER + " " + Build.MODEL :
-                    ", " + Build.MODEL;
+                    Build.MANUFACTURER + " " + Build.MODEL :
+                    Build.MODEL;
+            model_text = model_text.substring(0,1).toUpperCase().concat(model_text.substring(1));
             String platform_text = HiSettingsHelper.getInstance().isHiddenPlatform() ?
-                    "[color=DarkRed][size=2] posted by tgfc·ng [/size][/color]\r\n" :
-                    "[color=DarkRed][size=2] posted by tgfc·ng" + model_text + "[/size][/color]\r\n";
+                    "[color=DarkRed][size=2] Posted by TGFC·NG [/size][/color]\r\n" :
+                    "[color=DarkRed][size=2] Posted by " + model_text + "[/size][/color]\r\n";
             replyText = platform_text + replyText;
             String tail_text = HiSettingsHelper.getInstance().getTailText();
             if (!tail_text.isEmpty() && HiSettingsHelper.getInstance().isAddTail()) {
