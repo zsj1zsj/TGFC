@@ -11,7 +11,7 @@ import net.jejer.hipda.ui.HiApplication;
 
 public class HiUtils {
     public static final String UserAgentPrefix = "TGFC NG";
-    public static final String BaseUrl = "https://bbs.tgfcer.com/";
+    public static final String BaseUrl = "https://club.tgfcer.com/";
     public static final String SecCodeVerifyUrl = BaseUrl + "seccode.php?update=";
     public static final String ThreadListUrl = BaseUrl + "forumdisplay.php?fid=";
     public static final String DetailListUrl = BaseUrl + "viewthread.php?tid=";
