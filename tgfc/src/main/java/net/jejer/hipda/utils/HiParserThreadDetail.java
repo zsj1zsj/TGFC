@@ -290,7 +290,7 @@ public class HiParserThreadDetail {
             String poststatus = "";
             Elements poststatusES = postmessageE.select("i");
             if (poststatusES.size() > 0) {
-                poststatus = poststatusES.first().text();
+                //poststatus = poststatusES.first().text();
                 //remove then it will not show in content
                 //保留引用者信息
                 //poststatusES.first().remove();
